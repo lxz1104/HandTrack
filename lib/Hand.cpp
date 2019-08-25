@@ -91,11 +91,6 @@ namespace ht {
 			return false;
 		}
 
-#ifdef DEBUG
-		cv::Mat visual = cv::Mat::zeros(fullMapSize.height, fullMapSize.width, CV_8UC3);
-		cv::Mat defectVisual = cv::Mat::zeros(fullMapSize.height, fullMapSize.width, CV_8UC3);
-
-#endif
 		if (points->size() == 0 || num_points == 0) {
 			BOOST_LOG_TRIVIAL(debug) << "集群大小为零";
 			return false;
@@ -177,12 +172,8 @@ namespace ht {
 			this->contactL_ij = contour[contactL];
 			this->contactR_ij = contour[contactR];
 			// 求手臂中点的IJ坐标
-			//this->armmid = (contactL_ij + contactR_ij) / 2;
-			this->armmid.x = (contactL_ij.x + contactR_ij.x) / 2;
-			this->armmid.y = (contactL_ij.y + contactR_ij.y) / 2;
-			if (contactL_ij == contactR_ij) {
-				std::cout << "#############: 左右一样" << std::endl;
-			}
+			this->armmid = (contactL_ij + contactR_ij) / 2;
+
 			// step 2: 从 lci 和 rci移动的方向检测
 			// direction: 1 = lci +, rci -; -1 = lci -, rci +
 			if (((contactR > contactL) && (contactR - contactL < (int)contour.size() / 2)) ||
@@ -294,16 +285,18 @@ namespace ht {
 
 		/** 寻找主导方向 */
 		double contourFar = -1.0; uint contourFarIdx = 0;
+		Vec3f contourFarXYZ;
 		for (uint i = 0; i < contour.size(); ++i) {
-			double norm = util::norm(util::averageAroundPoint(xyzMap, contour[i] - topLeftPt, params->xyzAverageSize) -
+			double norm = util::norm(util::averageAroundPoint(this->xyzMap, this->contour[i] - this->topLeftPt, this->params->xyzAverageSize) -
 				this->palmCenterXYZ);
 			if (norm > contourFar) {
 				contourFar = norm;
 				contourFarIdx = i;
 			}
 		}
-
+		contourFarXYZ = util::averageAroundPoint(this->xyzMap, this->contour[contourFarIdx] - this->topLeftPt, this->params->xyzAverageSize);
 		this->dominantDir = util::normalize(contour[contourFarIdx] - this->palmCenterIJ);
+		this->dominantDirXYZ = util::normalize(contourFarXYZ - this->palmCenterXYZ);
 
 		/** 使用SVM验证物体是否为手 */
 
@@ -358,12 +351,6 @@ namespace ht {
 		{
 			// 包含有关一个缺陷的所有信息
 			cv::Vec4i defect = defects[i];
-
-#ifdef DEBUG
-			cv::line(defectVisual, contour[defects[i][0]], contour[defects[i][2]], cv::Scalar(0, 255, 0));
-			cv::line(defectVisual, contour[defects[i][1]], contour[defects[i][2]], cv::Scalar(0, 0, 255));
-			cv::circle(defectVisual, contour[defects[i][2]], 5, cv::Scalar(255, 255, 255), 2);
-#endif
 
 			// 凸包上缺陷开始的点。作为指尖候选
 			Point2i start = contour[defect[0]] - topLeftPt;
@@ -423,45 +410,6 @@ namespace ht {
 			}
 		}
 
-#ifdef DEBUG
-		cv::polylines(visual, contour, true, cv::Scalar(0, 200, 0));
-
-		for (int i = 0; i < goodDefects.size(); ++i)
-		{
-			cv::Vec4i defect = defects[goodDefects[i]];
-			Point2i start = contour[defect[0]] - topLeftPt,
-				end = contour[defect[1]] - topLeftPt,
-				farPt = contour[defect[2]] - topLeftPt;
-
-			cv::circle(visual, farPt + topLeftPt, 10, cv::Scalar(255, 255, 0), 2);
-
-			if (start.y + topLeftPt.y > fullMapSize.height - 20 ||
-				end.y + topLeftPt.y > fullMapSize.height - 20) {
-			}
-
-			cv::line(visual, start + topLeftPt, farPt + topLeftPt, cv::Scalar(255, 100, 0), 2);
-			cv::line(visual, end + topLeftPt, farPt + topLeftPt, cv::Scalar(0, 0, 255), 2);
-		}
-
-		cv::circle(visual, circen, cirrad, cv::Scalar(255, 0, 255), 2);
-
-		for (int i = 0; i < fingerDefectCands.size(); ++i) {
-			cv::circle(visual, contour[fingerDefectCands[i]], 8, cv::Scalar(255, 255, 255), 2);
-		}
-
-		cv::rectangle(visual, contactL_ij - Point2i(10, 10), contactL_ij + Point2i(10, 10),
-			cv::Scalar(0, 0, 255), 2);
-		cv::rectangle(visual, contactR_ij - Point2i(10, 10), contactR_ij + Point2i(10, 10),
-			cv::Scalar(0, 0, 255), 2);
-
-		cv::rectangle(visual, wristR_ij - Point2i(10, 10), wristR_ij + Point2i(10, 10),
-			cv::Scalar(0, 255, 255), 2);
-		cv::rectangle(visual, wristL_ij - Point2i(10, 10), wristL_ij + Point2i(10, 10),
-			cv::Scalar(0, 255, 255), 2);
-
-		cv::imshow("[Hand Defects Debug]", defectVisual);
-#endif
-
 		// 从上一轮筛选出来候选点中选择指尖点
 		std::vector<Point2i> fingerTipsIj, fingerDefectsIj;
 		std::vector<Vec3f> fingerTipsXyz;
@@ -488,23 +436,6 @@ namespace ht {
 				float finger_length_ij = util::euclideanDistance(finger_ij, defect_ij);
 				float curve_near = util::contourCurvature(contour, fingerTipCands[i], finger_length_ij * 0.15f);
 				float curve_far = util::contourCurvature(contour, fingerTipCands[i], finger_length_ij * 0.45f);
-#ifdef DEBUG
-				cv::Scalar txtColorNear, txtColorFar;
-				txtColorFar = txtColorNear = cv::Scalar(150, 150, 150);
-				if (curve_near < params->fingerCurveNearMin) {
-					txtColorNear = cv::Scalar(0, 0, 255);
-				}
-				if (curve_far < params->fingerCurveFarMin) {
-					txtColorFar = cv::Scalar(0, 0, 255);
-				}
-
-				cv::putText(visual,
-					std::to_string(curve_near), finger_ij + topLeftPt + Point2i(0, 10),
-					0, 0.3, txtColorNear, 1);
-				cv::putText(visual,
-					std::to_string(curve_far) + "F", finger_ij + topLeftPt + Point2i(0, -10),
-					0, 0.3, txtColorFar, 1);
-#endif
 
 				if (finger_length < params->fingerLenMax && finger_length > params->fingerLenMin &&
 					finger_defect_slope > params->fingerDefectSlopeMin &&
@@ -655,29 +586,6 @@ namespace ht {
 				float curve_near = util::contourCurvature(contour, indexFinger_idx, finger_length_ij * 0.15f);
 				float curve_far = util::contourCurvature(contour, indexFinger_idx, finger_length_ij * 0.45f);
 
-#ifdef DEBUG
-				cv::Scalar txtColorNear = cv::Scalar(0, 255, 255);
-				cv::Scalar txtColorFar = cv::Scalar(0, 255, 255);
-				if (curve_near < params->fingerCurveNearMin) {
-					txtColorNear = cv::Scalar(0, 0, 190);
-				}
-				if (curve_far < params->fingerCurveFarMin) {
-					txtColorFar = cv::Scalar(0, 0, 190);
-				}
-
-				cv::rectangle(visual, cv::Rect(bestDef.x + topLeftPt.x - 5,
-					bestDef.y + topLeftPt.y - 5, 10, 10),
-					cv::Scalar(255, 0, 0), 2);
-
-				cv::putText(visual,
-					std::to_string(curve_far) + "F", indexFinger_ij + Point2i(0, 10),
-					0, 0.5, txtColorFar, 1);
-
-				cv::putText(visual,
-					std::to_string(curve_near), indexFinger_ij + Point2i(0, -10),
-					0, 0.5, txtColorNear, 1);
-#endif
-
 				if (curve_near < params->fingerCurveNearMin ||
 					curve_far < params->fingerCurveFarMin) {
 					this->fingersIJ.clear(); this->fingersXYZ.clear();
@@ -695,10 +603,6 @@ namespace ht {
 			}
 		}
 
-#ifdef DEBUG
-		cv::imshow("[Hand Debug]", visual);
-#endif
-
 		int nFin = (int)this->fingersIJ.size();
 
 		if (nFin == 1 && util::distanOfTwoPointIJ(contour[contourFarIdx], this->fingersIJ.at(0)) > 100)
@@ -707,6 +611,9 @@ namespace ht {
 			this->dominantDir = util::normalize(this->palmCenterIJ - wristCenter);
 			this->fingersIJ.clear();
 			this->fingersXYZ.clear();
+
+			contourFarXYZ = (this->wristXYZ[0] + this->wristXYZ[1]) / 2;
+			this->dominantDirXYZ = util::normalize(this->palmCenterXYZ - contourFarXYZ);
 		}
 
 		// 根据指尖到掌心的连线于手腕线的夹角从小到大排序 
@@ -757,6 +664,9 @@ namespace ht {
 			//BOOST_LOG_TRIVIAL(debug) << "手指数为0";
 			Point2i wristCenter((this->wristIJ[0] + this->wristIJ[1]) / 2);
 			this->dominantDir = util::normalize(this->palmCenterIJ - wristCenter);
+
+			contourFarXYZ = (this->wristXYZ[0] + this->wristXYZ[1]) / 2;
+			this->dominantDirXYZ = util::normalize(this->palmCenterXYZ - contourFarXYZ);
 			return true;
 		}
 
@@ -838,96 +748,100 @@ namespace ht {
 
 	}
 
-	const Vec3f& Hand::getPalmCenter() const
+	Vec3f Hand::getPalmCenter() const
 	{
-		return palmCenterXYZ;
+		return this->palmCenterXYZ;
 	}
 
-	const Point2i& Hand::getPalmCenterIJ() const
+	Point2i Hand::getPalmCenterIJ() const
 	{
-		return palmCenterIJ;
+		return this->palmCenterIJ;
 	}
 
-	const std::vector<Vec3f>& Hand::getFingers() const
+	std::vector<Vec3f> Hand::getFingers() const
 	{
-		return fingersXYZ;
+		return this->fingersXYZ;
 	}
 
-	const std::vector<Point2i>& Hand::getFingersIJ() const
+	std::vector<Point2i> Hand::getFingersIJ() const
 	{
-		return fingersIJ;
+		return this->fingersIJ;
 	}
 
-	const std::vector<Vec3f>& Hand::getDefects() const
+	std::vector<Vec3f> Hand::getDefects() const
 	{
-		return defectsXYZ;
+		return this->defectsXYZ;
 	}
 
-	const std::vector<Point2i>& Hand::getDefectsIJ() const
+	std::vector<Point2i> Hand::getDefectsIJ() const
 	{
-		return defectsIJ;
+		return this->defectsIJ;
 	}
 
-	const std::vector<Vec3f>& Hand::getWrist() const
+	std::vector<Vec3f> Hand::getWrist() const
 	{
-		return wristXYZ;
+		return this->wristXYZ;
 	}
 
-	const std::vector<Point2i>& Hand::getWristIJ() const
+	std::vector<Point2i> Hand::getWristIJ() const
 	{
-		return wristIJ;
+		return this->wristIJ;
+	}
+
+	Vec3f Hand::getDominantDirectionXYZ() const {
+		return this->dominantDirXYZ;
 	}
 
 	double Hand::getCircleRadius() const
 	{
-		return circleRadius;
+		return this->circleRadius;
 	}
 
 	Point2f Hand::getDominantDirection() const
 	{
-		return dominantDir;
+		return this->dominantDir;
 	}
 
 	double Hand::getSVMConfidence() const
 	{
-		return svmConfidence;
+		return this->svmConfidence;
 	}
 
 	bool Hand::isValidHand() const
 	{
-		return isHand;
+		return this->isHand;
 	}
 
 	bool Hand::touchingEdge() const
 	{
-		return leftEdgeConnected || rightEdgeConnected;
+		return this->leftEdgeConnected || rightEdgeConnected;
 	}
 
 	bool Hand::touchingLeftEdge() const
 	{
-		return leftEdgeConnected;
+		return this->leftEdgeConnected;
 	}
 
 	bool Hand::touchingRightEdge() const
 	{
-		return rightEdgeConnected;
+		return this->rightEdgeConnected;
 	}
 
 	/** 打标签用接口 **/
 
 	std::vector<Vec3f> Hand::getFingersSort() const
 	{
-		return fingersXYZSort;
+		return this->fingersXYZSort;
 	}
 
 	std::vector<Point2i> Hand::getFingersIJSort() const
 	{
-		return fingersIJSort;
+		return this->fingersIJSort;
 	}
 
 	std::vector<Vec3f> Hand::getDefectsSort() const
 	{
-		return defectsXYZSort;
+		return this->defectsXYZSort;
 	}
 
 	std::vector<float> Hand::getinclude() const
@@ -937,32 +851,32 @@ namespace ht {
 
 	std::vector<Point2i> Hand::getDefectsIJSort() const
 	{
-		return defectsIJSort;
+		return this->defectsIJSort;
 	}
 
 	Vec3f Hand::getwristmid() const
 	{
-		return wristmidXYZ;
+		return this->wristmidXYZ;
 	}
 
 	Point2i Hand::getarmmidIJ() const
 	{
-		return armmid;
+		return this->armmid;
 	}
 
 	Point2i Hand::getwristmidIJ() const
 	{
-		return wristmidIJ;
+		return this->wristmidIJ;
 	}
 
 	Point2i Hand::getcontactL_ij() const
 	{
-		return contactL_ij;
+		return this->contactL_ij;
 	}
 
 	Point2i Hand::getcontactR_ij() const
 	{
-		return contactR_ij;
+		return this->contactR_ij;
 	}
 }
 

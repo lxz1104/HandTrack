@@ -40,7 +40,7 @@ namespace ht {
     Point2i FrameObject::findCenter(const std::vector<Point2i> & contour)
     {
 		//使用图像时查找对象的质量中心
-		//Cx=M10/M00 and Cy=M01/M00
+		//Cx=M10/M00 & Cy=M01/M00
         cv::Moments M = cv::moments(contour, false);
         Point2i center = Point2i(static_cast<int>(M.m10 / M.m00), static_cast<int>(M.m01 / M.m00));
         return center;
@@ -69,7 +69,7 @@ namespace ht {
 
     double FrameObject::getSurfArea() {
         if (surfaceArea == -1) {
-            // lazily compute SA on demand
+            // 按需简单计算SA
             surfaceArea = util::surfaceArea(fullMapSize, *points, *points_xyz);
         }
         return surfaceArea;
@@ -133,22 +133,15 @@ namespace ht {
 
         computeGrayMap(xyzMap, points, points_xyz, topLeftPt, num_points);
 
-        std::vector<std::vector<Point2i> > contours;
+        std::vector<std::vector<Point2i>> contours;
 
-		//cv::imshow("gray", grayMap);
-        cv::Mat thresh, scaledZImage;
+        cv::Mat thresh;
 		int threshhod = 50;
         cv::threshold(grayMap, thresh, 25, 255, cv::THRESH_BINARY);
-		//scaledZImage.create(cv::Size(thresh.cols * 3, thresh.rows * 3), CV_8UC1);
-		//resize(thresh, scaledZImage, scaledZImage.size());
-		//cv::imshow("thresh", scaledZImage);
-		//cv::Canny(grayMap, thresh, threshhod, threshhod * 3);
+
         cv::findContours(thresh, contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE,
             topLeftPt);
-		//scaledZImage.create(cv::Size(thresh.cols * 3, thresh.rows * 3), CV_8UC1);
-		//resize(thresh, scaledZImage, scaledZImage.size());
-		//cv::imshow("Canny", grayMap);
-
+	
         int maxId = -1;
 
         for (int i = 0; i < (int)contours.size(); ++i)

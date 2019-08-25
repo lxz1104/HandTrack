@@ -2,18 +2,7 @@
 
 namespace ht {
 	void CamListener::onNewData(const royale::DepthData* data) {
-		// this callback function will be called for every new depth frame
-
 		std::lock_guard<std::mutex> lock(this->imgMutex);
-		//this->pZImage.reset(new cv::Mat);
-		//this->pGrayImage.reset(new cv::Mat);
-		//this->pXYZImage.reset(new cv::Mat);
-		//this->pConfidenceMap.reset(new cv::Mat);
-
-		//this->pZImage->create(cv::Size(data->width, data->height), CV_32FC1);
-		//this->pGrayImage->create(cv::Size(data->width, data->height), CV_32FC1);
-		//this->pXYZImage->create(cv::Size(data->width, data->height), CV_32FC3);
-		//this->pConfidenceMap->create(cv::Size(data->width, data->height), CV_8UC1);
 
 		// 将图像矩阵置零
 		this->zImage = cv::Scalar::all(0);

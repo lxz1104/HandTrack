@@ -5,7 +5,7 @@
 
 namespace ht {
     namespace classifier {
-        // Classifier implementation
+        // 分类器实现部分
         bool Classifier::isTrained() const {
             return trained;
         }
@@ -47,7 +47,7 @@ namespace ht {
             var_depth /= totalpts;
         }
 
-        // SVMHandClassifier implementation
+        // SVM手部分类器实现
 
         const double SVMHandClassifier::DEFAULT_HYPERPARAMS[5 * NUM_SVMS] = {
             // gamma       coef0       C       eps     p
@@ -77,7 +77,7 @@ namespace ht {
         }
 
         SVMHandClassifier::~SVMHandClassifier() {
-            // do nothing
+            // 。。。
 
         }
 
@@ -131,26 +131,26 @@ namespace ht {
 
             std::ifstream ifsLabels(labelsPath), ifsFeats(featuresPath);
 
-            // total cases
+            // 所有选项
             int N; ifsLabels >> N;
 
-            // ignore first line of features file (feature names); we don't need it
+            // 忽略要素文件的第一行（特征名称）
             std::string _; getline(ifsFeats, _);
 
-            // record number of features for SVM #
+            // 记录SVM的特征数量 #
             int numFeats[NUM_SVMS];
 
-            // record number of fingers for SVM #
+            // 记录SVM的手指数量 #
             int numFing[NUM_SVMS];
 
-            // record number of samples for SVM #
+            // 记录SVM样本数 #
             int numSamples[NUM_SVMS];
 
-            memset(numFeats, 0x3f, sizeof numFeats); // large number
-            memset(numFing, 0x3f, sizeof numFing); // large number
+            memset(numFeats, 0x3f, sizeof numFeats); // 重置为最大值，63
+            memset(numFing, 0x3f, sizeof numFing); // 重置为最大值，63
             memset(numSamples, 0, sizeof numSamples);
 
-            // pre-scan features file to determine data matrix dimensions
+            // 用于确定数据矩阵尺寸的预扫描特征文件
             for (int i = 0; i < N; ++i) {
                 std::string name;
                 int numFeatures, numFingers;
@@ -164,11 +164,11 @@ namespace ht {
                     numFing[svmID] = std::min(numFingers, numFing[svmID]);
                 }
 
-                // ignore rest of line
+                // 忽略该行的其余部分
                 std::getline(ifsFeats, _);
             }
 
-            // start from beginning
+            // 从文件头开始
             ifsFeats.seekg(0, std::ios::beg); getline(ifsFeats, _);
 
             cv::Mat data[NUM_SVMS], labels[NUM_SVMS];
@@ -179,7 +179,7 @@ namespace ht {
                 std::cerr << numFeats[i] << " ";
             }
 
-            // use to record samples read
+            // 用于记录读取的样本
             memset(numSamples, 0, sizeof numSamples);
 
             size_t i;
@@ -187,7 +187,7 @@ namespace ht {
                 std::string lbName = "", ftName = "";
                 int label, numFeatures, numFingers;
 
-                // synchronize
+                // 同步
                 if (!(ifsLabels >> lbName >> label) || !(ifsFeats >> ftName >> numFeatures >> numFingers)) {
                     break;
                 }
@@ -199,14 +199,14 @@ namespace ht {
                     continue;
                 }
 
-                // add label
+                // 添加标签
                 labels[currSVMId].at<int>(0, numSamples[currSVMId]) = label;
                 float * ptr = data[currSVMId].ptr<float>(numSamples[currSVMId]++);
 
                 // read features
                 for (int j = 0; j < numFeatures - 1; ++j) {
                     if (j >= numFeats[currSVMId] - 1) {
-                        // ignore
+                        // 忽略
                         std::getline(ifsFeats, _);
                         break;
                     }
@@ -214,7 +214,7 @@ namespace ht {
                 }
             }
 
-            // clean up old pointers & allocate memory
+            // 清除旧指针并分配内存
             for (int i = 0; i < NUM_SVMS; ++i) {
                 std::cout << "Loaded " << numSamples[i] << " training samples for SVM #" << i <<
                     " (" << numSamples[i] << " features)" << "\n";
@@ -271,7 +271,7 @@ namespace ht {
         double SVMHandClassifier::classify(const cv::Mat & features) const {
             if (!trained) throw ClassifierNotTrainedException();
 
-            // if no fingers, predict not hand
+            // 如果没有手指，停止预测手
             if (!features.data || features.cols == 0) return 0.0;
 
             int nFeat = features.cols;
@@ -281,7 +281,7 @@ namespace ht {
             int svmIdx = getSVMIdx(features);
             double result = svm[svmIdx]->predict(samples);
 
-            // range [0, 1]
+            // 控制范围在 [0, 1]
             return std::max(std::min(1.0, result), 0.0);
         }
 
@@ -322,16 +322,16 @@ namespace ht {
 
             double area = hand.getSurfArea();
 
-            // average distance to palm center (of all points)
+            // 手掌中心的平均距离（所有点中）
             result.push_back(avgdist * 20.0);
 
-            // variance to palm center (of all points)
+            // 与手掌中心的差异（所有点）
             result.push_back(sqrt(vardist) * 25.0f);
 
-            // surface area
+            // 表面积
             result.push_back(area * 10.00f);
 
-            // variance of depth (average of depth not used)
+            // 深度变化（未使用深度平均值）
             result.push_back(sqrt(vardepth) * 25.0f);
 
             std::vector<ht::Point2i> cont = hand.getContour(),
@@ -340,36 +340,36 @@ namespace ht {
 
             double contArea = cv::contourArea(cont);
 
-            // contour area as fraction of hull area
+            // 轮廓面积作为凸包面积的一部分
             result.push_back(float(contArea / cv::contourArea(hull)));
 
             cv::Rect bounds = hand.getBoundingBox();
 
-            // contour area as fraction of bounding box area
+            // 轮廓区域作为边界框区域的一部分
             result.push_back(contArea / double(bounds.width * bounds.height));
 
-            // arc length of contour as fraction of arc length of hull
+            // 轮廓的弧长作为凸包弧长的一部分
             result.push_back(cv::arcLength(cont, true) /
                 cv::arcLength(hull, true) * 0.5f);
 
             int pa, pb;
             double diam = util::diameter(cont, pa, pb);
 
-            // inscribed circle radius as fraction of diameter
+            // 内切圆半径直径的大小
             result.push_back(hand.getCircleRadius() / diam * 2.0f);
 
 			ht::Vec3f paXYZ = ht::util::averageAroundPoint(depth_map, cont[pa]);
 			ht::Vec3f pbXYZ = ht::util::averageAroundPoint(depth_map, cont[pb]);
 
-            // diameter of cluster, projected to 3D
+            // 集群的直径，投影到3d
             result.push_back(ht::util::euclideanDistance(paXYZ, pbXYZ));
 
-            // wrist width
+            // 手腕宽度
             result.push_back(ht::util::euclideanDistance(wrist[0], wrist[1]));
 
             typedef std::pair<boost::polygon::detail::fpt64, int> pfi;
 
-            // (order the fingers by length)
+            // 按长度排序手指
             std::vector<pfi> fingerOrder;
 
 			ht::Vec3f midWrist = wrist[0] + (wrist[1] - wrist[0]) / 2;
@@ -387,10 +387,10 @@ namespace ht {
             }
             std::sort(fingerOrder.begin(), fingerOrder.end(), std::greater<pfi>());
 
-            // average finger length
+            // 手指平均长度
             result.push_back(avgLen / nFingers * 5.0f);
 
-            // average distance from fingers to middle of wrist
+            // 手指到手腕中部的平均距离
             result.push_back(avgMidWristDist / nFingers * 2.0f);
 
             auto fingers = hand.getFingers(), defects = hand.getDefects();
@@ -451,7 +451,7 @@ namespace ht {
             return mat;
         }
 
-        // SVMHandValidator implementation
+        // SVM超平面参数
         const double SVMHandValidator::DEFAULT_HYPERPARAMS[5] = {
             // gamma       coef0       C       eps     p
             1.0959,     0.5000,     0.5048, 1.5e-16,  0.0548,
@@ -517,16 +517,16 @@ namespace ht {
 
             std::ifstream ifsLabels(labelsPath), ifsFeats(featuresPath);
 
-            // total cases
+            // 所有选项
             int N; ifsLabels >> N;
 
-            // ignore first line of features file (feature names); we don't need it
+            // 忽略要素文件的第一行（特征名称）
             std::string _; getline(ifsFeats, _);
 
             int numFeats;
             ifsFeats >> _ >> numFeats;
 
-            // start from beginning
+            // 从文件头开始读取
             ifsFeats.seekg(0, std::ios::beg); getline(ifsFeats, _);
 
             cv::Mat data, labels;
@@ -538,20 +538,20 @@ namespace ht {
                 std::string lbName = "", ftName = "";
                 int label, numFeatures;
 
-                // synchronize
+                // 同步
                 if (!(ifsLabels >> lbName >> label) || !(ifsFeats >> ftName >> numFeatures)) {
                     break;
                 }
                 while (lbName != ftName && (ifsLabels >> lbName >> label)) {}
 
-                // add label
+                // 添加标签
                 labels.at<int>(0, i) = label;
                 float * ptr = data.ptr<float>(i);
 
-                // read features
+                // 读取特征信息
                 for (int j = 0; j < numFeatures; ++j) {
                     if (j >= numFeats) {
-                        // ignore
+                        // 忽略
                         std::getline(ifsFeats, _);
                         break;
                     }
@@ -559,7 +559,7 @@ namespace ht {
                 }
             }
 
-            // clean up old pointers & allocate memory
+            // 清除旧指针并分配内存
             BOOST_LOG_TRIVIAL(info) << "Loaded " << i <<
                 " training samples (" << numFeats << " features)";
 
@@ -596,11 +596,11 @@ namespace ht {
         double SVMHandValidator::classify(const cv::Mat & features) const {
             if (!trained) throw ClassifierNotTrainedException();
 
-            // if no fingers, predict not hand
+            // 如果没有手指，停止预测手。
             if (features.data == nullptr || features.cols == 0) return 0.0f;
             float result = svm->predict(features);
 
-            // range [0, 1]
+            // 控制范围为 [0, 1]
             return std::max(std::min(1.0f, result), 0.0f);
         }
 
@@ -644,9 +644,6 @@ namespace ht {
             ptr[num_features + 3] = sqrtf(varDepth) * 25.0f;
             
             double step = PI / num_features * 2.0;
-#ifdef DEBUG
-            cv::Mat visual = hand.getDepthMap().clone();
-#endif
 
 			double angle = 0.0;
             for (int i = 0; i < num_features; ++i) {
@@ -659,17 +656,9 @@ namespace ht {
                  Vec3f pos = util::averageAroundPoint(depth_map, farPoint, avg_size);
                  ptr[i] = util::euclideanDistance(pos, centerXYZ) * 10;
 
-#ifdef DEBUG
-                 cv::circle(visual, farPoint + top_left, 5, cv::Scalar(255, 0, 255), 2);
-#endif
 
                  angle += step;
             }
-
-#ifdef DEBUG
-                 cv::circle(visual, Point2i(center) + top_left, 5, cv::Scalar(0, 255, 100), 2);
-                 cv::imshow("[SVM Feature Extraction]", visual);
-#endif
 
             return result;
         }

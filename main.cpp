@@ -18,21 +18,19 @@ int main() {
 	// 操作选项
 	bool showHands = true, useSVM = false, useEdgeConn = false, showArea = false;
 
-	// 开启相机
-	camera->beginCapture();
 	cv::Mat scaledZImage;
 
-	// store frame & FPS information
-	const int FPS_CYCLE_FRAMES = 8; // number of frames to average FPS over (FPS 'cycle' length)
+	// fps信息
+	const int FPS_CYCLE_FRAMES = 8; // 平均多少帧更新一次帧率
 	using ms = std::chrono::duration<float, std::milli>;
 	using time_point = std::chrono::high_resolution_clock::time_point;
 
 	std::chrono::high_resolution_clock timer = std::chrono::high_resolution_clock();
-	time_point currCycleStartTime = timer.now(); // start time of current cycle
+	time_point currCycleStartTime = timer.now(); // 当前周期的开始时间
 
-	float currFPS = 0.0; // current FPS
+	float currFPS = 0.0;	// 当前的帧率
 
-	int currFrame = 0; // current frame number (since launch/last pause)
+	int currFrame = 0;		// 当前位于第几帧
 
 	char chr[64] = { '/0' };
 
@@ -69,8 +67,8 @@ int main() {
 		cv::Mat handVisual;
 
 		// 可视化背景
-		Visualizer::visualizeXYZMap(xyzMap, handVisual, 10.0f);
-		
+		Visualizer::visualizeXYZMap(xyzMap, handVisual, 1.0f);
+		Visualizer::visualizeXYZMap(xyzMap, xyzMap, 1.0f);
 		
 		const cv::Scalar WHITE(255, 255, 255);
 
@@ -143,8 +141,6 @@ int main() {
 			showArea ^= 1; break;
 		}
 	}
-
-	camera->endCapture();
 	cv::destroyAllWindows();
 	return 0;
 }

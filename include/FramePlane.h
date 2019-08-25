@@ -45,12 +45,12 @@ namespace ht {
 		* 即, z = v[0]x + v[1]y + v[2]
 		*
 		* @param [in] v: 平面参数的矢量
-		* @param [in] points_ij: 容纳对象中的所有点坐标的向量容器(在屏幕坐标中)
-		* @param [in] points_xyz: 容纳对象中的所有点坐标的向量容器(在世界坐标中)
-		* @param [in] depth_map: 所有的点云数据。(可能包含此检测目标外部的点)
-		* @param [in] params: 对象/手检测的参数参数(如果未指定,则使用默认参数)
-		* @param [in] sorted:  点云是否已排序，如果为 true,则认为这些"点"已排序并跳过排序以节省时间
-		* @param [in] points_to_use:  可选,要用于目标对象"点"中的点数。默认情况下,使用所有点。
+		* @param [in] points_ij:		容纳对象中的所有点坐标的向量容器(在屏幕坐标中)
+		* @param [in] points_xyz:		容纳对象中的所有点坐标的向量容器(在世界坐标中)
+		* @param [in] depth_map:		所有的点云数据。(可能包含此检测目标外部的点)
+		* @param [in] params:			对象/手检测的参数参数(如果未指定,则使用默认参数)
+		* @param [in] sorted:			点云是否已排序，如果为 true,则认为这些"点"已排序并跳过排序以节省时间
+		* @param [in] points_to_use:	可选,要用于目标对象"点"中的点数。默认情况下,使用所有点。
 		*/
         FramePlane(Vec3f v, VecP2iPtr points_ij, VecV3fPtr points_xyz,
             const cv::Mat & depth_map, DetectionParams::Ptr params = nullptr,
@@ -108,7 +108,7 @@ namespace ht {
 		/** 边界(旋转)矩形的顶点 */
         void initializePlane();
 
-        /** Vertices of bounding (rotated) rectangle */
+        /** 边界（旋转）矩形的顶点 */
         std::vector<Point2f> boundingRect;
     };
 }

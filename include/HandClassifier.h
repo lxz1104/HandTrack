@@ -225,9 +225,8 @@ namespace ht {
 			 */
             SVMHandValidator();
 
-            /** Construct a SVM hand classifier by
-             *  loading the classifier models from disk.
-             *  @param path path to directory with model files
+			/** 通过从磁盘加载分类器模型，构造一个SVM手部分类器。
+             *  @param 模型文件目录的路径
              */
             explicit SVMHandValidator(const std::string & path);
 
@@ -300,7 +299,7 @@ namespace ht {
 
         private:
 
-			//  SVM
+			//  SVM容器
             cv::Ptr<cv::ml::SVM> svm;
 
 			/**

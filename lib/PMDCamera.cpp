@@ -103,7 +103,7 @@ namespace ht {
 			BOOST_LOG_TRIVIAL(error) << "Error registering data listener";
             exit(EXIT_FAILURE);
         }
-        //start capture mode
+        //开启相机捕获模式
         if (cameraDevice->startCapture() !=  royale::CameraStatus::SUCCESS)
         {
 			BOOST_LOG_TRIVIAL(error) << "Error starting the capturing";
@@ -118,39 +118,7 @@ namespace ht {
 		BOOST_LOG_TRIVIAL(info) << "Init " << this->getModelName() << " Camera...";
         //初始化相机
         this->initCamera();
-		//this->listener.setBuf(&this->xyzBuffer,&this->ampBuffer);
     }
-
-    const std::string PMDCamera::getModelName() const {
-        return "PMD";
-    }
-
-    int PMDCamera::getWidth() const {
-        return 224;
-    }
-
-    int PMDCamera::getHeight() const {
-        return 171; 
-    }
-
-    float PMDCamera::flagMapConfidenceThreshold() const {
-        return (60.0f / 255.0f*500.0f);
-    }
-
-    int PMDCamera::ampMapInvalidFlagValue() const {
-        return  0u;
-    }
-
-    bool PMDCamera::hasAmpMap() const
-    {
-        return false;
-    }
-
-    bool PMDCamera::hasFlagMap() const
-    {
-        return false;
-    }
-
 
     PMDCamera::~PMDCamera()
     {
@@ -162,7 +130,39 @@ namespace ht {
         }
     }
 
-	/** 此方法一定要重写 **/
+
+	/********************* 重写的基类方法 *****************/
+	const std::string PMDCamera::getModelName() const {
+		return "PMD";
+	}
+
+	int PMDCamera::getWidth() const {
+		return 224;
+	}
+
+	int PMDCamera::getHeight() const {
+		return 171;
+	}
+
+	float PMDCamera::flagMapConfidenceThreshold() const {
+		return (60.0f / 255.0f * 500.0f);
+	}
+
+	int PMDCamera::ampMapInvalidFlagValue() const {
+		return  0u;
+	}
+
+	bool PMDCamera::hasAmpMap() const
+	{
+		return false;
+	}
+
+	bool PMDCamera::hasFlagMap() const
+	{
+		return false;
+	}
+
+	/** !!此方法一定要重写 **/
     void PMDCamera::update(cv::Mat & xyz_map, cv::Mat & rgb_map, cv::Mat & ir_map,
                            cv::Mat & amp_map, cv::Mat & flag_map)
     {

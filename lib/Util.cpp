@@ -22,6 +22,14 @@
  *                工具函数
  *                请勿乱动
  */
+ /***********************************************************
+ @File: Util.cpp
+ @Author: LXZ
+ @Date: 2019-07-01
+ @Description: 几何计算类库
+ @History: NULL
+ ************************************************************/
+
 #include "stdafx.h"
 #include "Util.h"
 #include <boost/random.hpp>
@@ -85,21 +93,18 @@ namespace ht {
             return split(std::string(string_in), delimiters, ignore_empty, trim);
         }
 
-        // trim from start (in place)
         void ltrim(std::string & s) {
             s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](int ch) {
                 return !std::isspace(ch);
             }));
         }
 
-        // trim from end (in place)
         void rtrim(std::string & s) {
             s.erase(std::find_if(s.rbegin(), s.rend(), [](int ch) {
                 return !std::isspace(ch);
             }).base(), s.end());
         }
 
-        // trim from both ends (in place)
         void trim(std::string & s) {
             ltrim(s);
             rtrim(s);
@@ -120,21 +125,6 @@ namespace ht {
         Vec3b randomColor()
         {
             return Vec3b(rand() % 256, rand() % 256, rand() % 256);
-        }
-
-        Vec3b paletteColor(int color_index, bool bgr)
-        {
-            static const Vec3b palette[] = {
-                Vec3b(0, 220, 255), Vec3b(177, 13, 201), Vec3b(94, 255, 34),
-                Vec3b(54, 65, 255), Vec3b(64, 255, 255), Vec3b(217, 116, 0),
-                Vec3b(27, 133, 255), Vec3b(190, 18, 240), Vec3b(20, 31, 210),
-                Vec3b(75, 20, 133), Vec3b(255, 219, 127), Vec3b(204, 204, 57),
-                Vec3b(112, 153, 61), Vec3b(64, 204, 46), Vec3b(112, 255, 1),
-                Vec3b(170, 170, 170), Vec3b(225, 30, 42)
-            };
-
-            Vec3b color = palette[color_index % (int)(sizeof palette / sizeof palette[0])];
-            return bgr ? color : Vec3b(color[2], color[1], color[0]);
         }
 
         template<class T>
@@ -282,14 +272,13 @@ namespace ht {
         {
             cv::Vec<T, 3> best; int bestInliers = 0;
 
-            // number of points in each sample
 			// 每个样本中的点数
             static const int SAMPLE_SIZE = 3;
 
             if (num_points == -1) num_points = (int)points.size();
-            if (num_points < SAMPLE_SIZE) throw; // too few points 点数太少
+            if (num_points < SAMPLE_SIZE) throw; //点数太少
 
-            // create RNG
+            // 创建
             typedef boost::mt19937 rng_type;
             typedef boost::variate_generator<rng_type, boost::uniform_int<>> var_gen;
 
@@ -302,14 +291,13 @@ namespace ht {
                 randidx.emplace_back(rng, range[i]);
             }
 
-            // Begin iterating
 			// 开始迭代
 #ifdef _OPENMP
 			const uint threads_num = SAMPLE_SIZE > 12 ? 12 : SAMPLE_SIZE;
 #pragma omp parallel num_threads(threads_num) 
 #endif // _OPENMP
             for (int iteration = 0; iteration < iterations; ++iteration) {
-                // pick 3 random points
+                // 选取3个随机点
                 int idx[SAMPLE_SIZE];
 #ifdef _OPENMP
 #pragma omp parallel for \
@@ -324,14 +312,14 @@ namespace ht {
                 const cv::Vec<T, 3> & a = points[idx[0]],
                     &b = points[idx[1]], &c = points[idx[2]];
 
-                // compute equation of plane through these points
+                // 通过这些点计算平面方程
                 cv::Vec<T, 3> normal = cv::normalize((b - a).cross(c - a));
                 if (normal[2] > 0) normal = -normal;
 
                 T k = (normal[0] * a[0] + normal[1] * a[1]) / normal[2] + a[2];
                 cv::Vec<T, 3> eqn(-normal[0] / normal[2], -normal[1] / normal[2], k);
 
-                // compute number of inliers
+                // 计算入口数
                 int inliers = 0;
 
 #ifdef _OPENMP
@@ -433,13 +421,14 @@ namespace ht {
 
                     //std::cout << (refPtr[col], plane_equation) << endl;
                     if (pointPlaneSquaredDistance(refPtr[col], plane_equation) < threshold) {
-                        // found nearby plane, remove point (i.e. set to 0)
+                        // 找到附近的平面，删除点（即设置为0）
                         imgPtr[col] = 0;
                     }
                 }
             }
         }
 
+		// 实例化模板类型
         template void removePlane<uchar>(const cv::Mat & ref_cloud, cv::Mat & image, const Vec3f & plane_equation, double threshold, cv::Mat * mask, uchar mask_color);
         template void removePlane<ushort>(const cv::Mat & ref_cloud, cv::Mat & image, const Vec3f & plane_equation, double threshold, cv::Mat * mask, uchar mask_color);
         template void removePlane<uint>(const cv::Mat & ref_cloud, cv::Mat & image, const Vec3f & plane_equation, double threshold, cv::Mat * mask, uchar mask_color);
@@ -488,7 +477,7 @@ namespace ht {
 
             avgPos = totalPos / num_data_pts;
 
-            // compute influence
+            // 计算influence
             std::vector<double> influence(num_data_pts);
             std::vector<int> influenceOrder(num_data_pts);
 
@@ -497,7 +486,7 @@ namespace ht {
                 influenceOrder[i] = i;
             }
 
-            // order by influence
+            // 按influence大小排序
             std::sort(influenceOrder.begin(), influenceOrder.end(),
                 [& influence](int a, int b) {
                     return influence[a] < influence[b];
@@ -507,7 +496,7 @@ namespace ht {
             output.resize(NUM_OUTPUT_PTS);
             if (output_aux) output_aux->resize(NUM_OUTPUT_PTS);
 
-            // take elements with least influence
+            // 采用influence最小的元素
             for (int i = 0; i < NUM_OUTPUT_PTS; ++i) {
                 int idx = influenceOrder[i];
                 output[i] = data[idx];
@@ -570,9 +559,9 @@ namespace ht {
         {
             cv::Mat depth;
             cv::extractChannel(xyzMap, depth, 2);
-            //using image moments to find center of mass of the depth image
+            // 利用图像矩求深度图像的质心
             auto m = cv::moments(depth, false);
-            //Cx=M10/M00 and Cy=M01/M00
+            //Cx=M10/M00 & Cy=M01/M00
             return Point2i(int(m.m10 / m.m00), int(m.m01 / m.m00));
         }
 
@@ -599,21 +588,21 @@ namespace ht {
             }
 
             if (valid == 4) {
-                // if all four points are nonzero, add both triangles
+                // 如果所有四个点都不为零，则添加两个三角形
                 float a1 = triangleArea(pts[1], pts[2], pts[0]);
                 float a2 = triangleArea(pts[1], pts[2], pts[3]);
 
                 return a1 + a2;
             }
             else if (valid == 3) {
-                // swap to make sure the three good points are in the first three positions
+                // 交换以确保三个好点位于前三个位置
                 if (bad != 3) pts[bad] = pts[3];
 
-                // if three of four points are nonzero, add the triangle formed by these points
+                // 如果四个点中的三个不为零，则添加这些点形成的三角形
                 return triangleArea(pts[0], pts[1], pts[2]);
             }
             else {
-                // if there are <= 2 points: ignore this set of four points
+                // 如果存在<=2个点：忽略这组四个点
                 return 0.0f;
             }
         }
@@ -627,15 +616,15 @@ namespace ht {
             const Vec3f * ptr, *nxPtr = depthMap.ptr<Vec3f>(0);
 
             for (int r = 1; r < depthMap.rows; ++r) {
-                ptr = nxPtr; // reuse previous pointer; upper row
-                nxPtr = depthMap.ptr<Vec3f>(r); // lower row
+                ptr = nxPtr; // 重复使用上一个指针；回退到上一行
+                nxPtr = depthMap.ptr<Vec3f>(r); // 下一行
 
-                //                { top left, top right, bottom left, bottom right}
+                //                { 左上, 右上, 左下, 右下}
                 Vec3f pts[] = { ptr[0],   ptr[0],    nxPtr[0],    nxPtr[0] };
                 const int NUM_PTS = (sizeof pts) / (sizeof pts[0]);
 
                 for (int c = 1; c < depthMap.cols; ++c) {
-                    pts[0] = pts[1]; pts[2] = pts[3]; // reuse previous points
+                    pts[0] = pts[1]; pts[2] = pts[3]; // 重用以前的点
                     pts[1] = ptr[c]; pts[3] = nxPtr[c];
 
                     total += quadrangleArea(pts);
@@ -651,7 +640,7 @@ namespace ht {
             int cluster_size) {
 
             if (cluster_size < 0 || cluster_size >(int)points_ij.size())
-                cluster_size = (int)points_ij.size(); // default cluster size = vector size
+                cluster_size = (int)points_ij.size(); // 默认簇集群大小 = 容器大小
 
             if (cluster_size < 3) return 0;
 
@@ -836,12 +825,12 @@ namespace ht {
         }
 
         /***
-        Check whether candidate point is close enough to neighboring points
+        检查候选点是否足够靠近相邻点
         ***/
         static bool closeEnough(int x, int y, cv::Mat& depthMap, int num_neighbors, double max_distance)
         {
             auto num_close = 0;
-            //check to see if the neighbor pixels Euclidean distance is within defined max distance
+            //检查相邻像素欧几里得距离是否在定义的最大距离内
             if (x - 1 < 0 || depthMap.at<Vec3f>(y, x - 1)[2] == 0 ||
                 euclideanDistance(depthMap.at<Vec3f>(y, x), depthMap.at<Vec3f>(y, x - 1)) < max_distance)
             {
@@ -875,7 +864,7 @@ namespace ht {
         }
 
         /**
-         * Performs floodfill on ordered point cloud
+         * 对有序点云执行漫水填充
          */
         int floodFill(const cv::Mat & xyz_map, const Point2i & seed,
             float thresh, std::vector <Point2i> * output_ij_points,
@@ -1026,12 +1015,12 @@ namespace ht {
             return total;
         }
 
-        // convert an ij point to an angle, clockwise from (0, 1) (0 at 0 degrees, 2 * PI at 360)
+        // 从（0，1）顺时针将IJ点转换为角度（0度时为0，360度时为2*PI）
         double pointToAngle(const Point2f & pt) {
             return fmod(atan2(pt.x, -pt.y) + PI, 2 * PI);
         }
 
-        // convert angle to ij point with unit magnitude
+        // 用单位振幅将角度转换为IJ点
         Point2f angleToPoint(float angle)
         {
             angle += 2.5 * PI;
@@ -1045,6 +1034,7 @@ namespace ht {
             return angle;
         }
 
+		// 标准化
 		// (x / (√(x^2 + y^2)),y / (√(x^2 + y^2)) )
         Point2f normalize(const Point2f & pt)
         {
@@ -1341,7 +1331,7 @@ namespace ht {
             Point2i center = contour[index];
             int idx[2]; Point2f points[2];
 
-            // find the point on the contour at 'radius' distance from the center point
+			// 在距离中心点“半径”距离的轮廓上找点
             for (int i = 0; i < 2; ++i) {
                 int delta = i * 2 - 1; // {0: -1; 1: +1}
                 idx[i] = index;
@@ -1361,8 +1351,7 @@ namespace ht {
                 const Point2i & prevPt = contour[(idx[i] - delta + N) % N];
                 float pdist = euclideanDistance(prevPt, center);
 
-                // scale linearly on the edge of the contour between
-                // the previous and current points to approximate desired distance
+				// 在上一个点和当前点之间的轮廓边缘上线性缩放，以接近所需的距离。
                 if (dist > radius && radius >= pdist) {
                     float fact = (radius - pdist) / (dist - pdist);
                     points[i] = (1.0 - fact) * Point2f(prevPt) + fact * points[i];
@@ -1411,8 +1400,7 @@ namespace ht {
             float curr = 
                 ceilf(sqrtf(0.25f * xyz_map.rows * xyz_map.rows + 0.25f * xyz_map.cols * xyz_map.cols));
 
-            // find outermost farthest set pixel by linear scan
-
+			// 通过线性扫描查找最远的像素
             Point2i checkPt;
             for (; curr >= 0.0f; --curr) {
                 cv::Point2f pos = cen + curr * dir;
@@ -1434,7 +1422,20 @@ namespace ht {
             static const int MAX_LEVELS = 3;
             static std::string rootDir = "\n";
             if (rootDir == "\n") {
-                // else check current directory and parents
+				rootDir.clear();
+				const char* env = std::getenv("SVM_DIR");
+				if (env) {
+					// 如果存在并有效，使用环境变量
+					rootDir = env;
+
+					// 自动添加斜线
+					if (!rootDir.empty() && rootDir.back() != '/' && rootDir.back() != '\\')
+						rootDir.push_back('/');
+
+					std::ifstream test_ifs(rootDir + TEST_PATH);
+					if (!test_ifs) rootDir.clear();
+				}
+                // 检查当前目录和父目录
                 if (rootDir.empty()) {
                     for (int i = 0; i < MAX_LEVELS; ++i) {
                         std::ifstream test_ifs(rootDir + TEST_PATH);

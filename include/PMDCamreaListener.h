@@ -38,21 +38,12 @@ namespace ht {
 			this->confidence_map.copyTo(ampMap);
 			// this->confidence_map;
 		}
-		/*void setBuf(DataBuffer<cv::Mat> * xyzBuf,DataBuffer<cv::Mat> * ampBuff) {
-			this->ampBuffer = ampBuff;
-			this->xyzBuffer = xyzBuf;
-		}*/
 	private:
 		// 图像矩阵
 		cv::Mat zImage;
 		cv::Mat grayImage;
 		cv::Mat xyz_map;
 		cv::Mat confidence_map;
-
-		//std::unique_ptr<cv::Mat> pZImage;
-		//std::unique_ptr<cv::Mat> pGrayImage;
-		//std::unique_ptr<cv::Mat> pXYZImage;
-		//std::unique_ptr<cv::Mat> pConfidenceMap;
 
 		// 相机内参矩阵
 		cv::Mat cameraMatrix;
@@ -64,10 +55,6 @@ namespace ht {
 
 		// 线程锁
 		std::mutex imgMutex;
-
-		/** 图像缓冲 */
-		//DataBuffer<std::unique_ptr<cv::Mat>> xyzBuffer;
-		//DataBuffer<std::unique_ptr<cv::Mat>> ampBuffer;
 	};
 }
 

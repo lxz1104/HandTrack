@@ -52,7 +52,7 @@
 
 namespace ht {
 
-	// Typedefs for common types
+	// 基础类型
 	typedef cv::Point Point;
 	typedef cv::Point2i Point2i;
 	typedef cv::Point2f Point2f;

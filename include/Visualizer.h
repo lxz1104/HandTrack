@@ -56,13 +56,6 @@ namespace ht {
             const std::vector<std::shared_ptr<FramePlane> > * touch_planes = nullptr);
 
 		/**
-		* 多边形网格可视化.
-		* 将PCL点云可视化为多边形网格
-		* @param [in] cloud 要可视化的PCL点云
-		*/
-        //static void visulizePolygonMesh(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud);
-
-		/**
 		* 平面回归可视化。
 		* @param [in]  input_mat 用于绘制可视化效果的基础xyzmap
 		* @param [out] output    输出图像
@@ -73,7 +66,6 @@ namespace ht {
 		*/
         static void visualizePlaneRegression(const cv::Mat & input_mat, cv::Mat & output, 
                     std::vector<double> &equation, const double threshold, bool clicked = false);
-
 
 		/**
 		 * 可视化平面上的点。

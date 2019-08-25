@@ -103,9 +103,9 @@ namespace ht {
 		/**
 		 * 是否使用SVM进行分类
 		 *
-		 * @default: true
+		 * @default: false
 		 */
-        bool handUseSVM = true;
+        bool handUseSVM = false;
 
 		/**
 		 * 第一个手部对象的最低 SVM 置信度值 (范围: [0,1])

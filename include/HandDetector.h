@@ -14,7 +14,7 @@
 #include "Hand.h"
 
 namespace ht {
-	/** 支持在深度投影图像（XYZ地图）中检测多只手的手检测器类。
+	/** 支持在深度数据（XYZMap）中检测多只手的手检测器类。
 	 * @see PlaneDetector
 	 */
     class HandDetector : public Detector {

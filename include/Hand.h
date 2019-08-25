@@ -75,42 +75,42 @@ namespace ht {
 		/**
 		 * 得到手掌中心的（x，y，z）位置
 		 */
-        const Vec3f & getPalmCenter() const;
+        Vec3f getPalmCenter() const;
 
 		/**
 		 * 得到手掌中心的（i，j）位置
 		 */
-        const Point2i & getPalmCenterIJ() const;
+        Point2i getPalmCenterIJ() const;
 
 		/**
 		 * 获取所有检测到的指尖的（x，y，z）位置
 		 */
-        const std::vector<Vec3f> & getFingers() const;
+        std::vector<Vec3f> getFingers() const;
 
 		/**
 		 * 获取所有检测到的指尖的（i，j）位置
 		 */
-        const std::vector<Point2i> & getFingersIJ() const;
+        std::vector<Point2i> getFingersIJ() const;
 
 		/**
 		 * 获取所有检测到的缺陷（手指根部）的（X、Y、Z）位置
 		 */
-        const std::vector<Vec3f> & getDefects() const;;
+        std::vector<Vec3f> getDefects() const;;
 
 		/**
 		 * 获取所有检测到的缺陷（手指根部）的（i，j）位置
 		 */
-        const std::vector<Point2i> & getDefectsIJ() const;;
+        std::vector<Point2i> getDefectsIJ() const;;
 
 		/**
 		 * 获取手腕两侧的（x，y，z）坐标（[0]左，[1]右）
 		 */
-        const std::vector<Vec3f> & getWrist() const;
+        std::vector<Vec3f> getWrist() const;
 
 		/**
 		 * 得到手腕两侧的（i，j）坐标（[0]左，[1]右）
 		 */
-        const std::vector<Point2i> & getWristIJ() const;
+        std::vector<Point2i> getWristIJ() const;
 
 		/**
 		 * 获取手上最大（2d）内接圆的半径，以GetPalmCenter（）获取到的点为圆心。
@@ -123,26 +123,9 @@ namespace ht {
         Point2f getDominantDirection() const;
 
 		/**
-		 * 获取此对象的SVM置信度，[0.0，1.0]（较高=更可能是手）
+		 * 得到一个指向手的“主导”方向的三维单位向量
 		 */
-        double getSVMConfidence() const;
-
-		/**
-		 * 如果“手簇”接触底部边缘，则为“真”，表示对象可能连接到用户的身体（手、手臂等）。
-		 */
-        bool touchingEdge() const;
-
-		/**
-		 * 如果手簇接触到屏幕左边缘的下半部分或屏幕下边缘的左半部分，则为true。
-		 * 接触边缘意味着物体可能与使用者的身体（手、臂等）相连。
-		 */
-        bool touchingLeftEdge() const;
-
-		/**
-		* 如果手簇接触到屏幕左边缘的下半部分或屏幕下边缘的左半部分，则为true。
-		* 接触边缘意味着物体可能与使用者的身体（手、臂等）相连。
-		*/
-        bool touchingRightEdge() const;
+		Vec3f getDominantDirectionXYZ() const;
 
 		/**
 		 * 如果此对象是有效手，则为true (queryFrameObjects/queryFrameHands 将只返回有效手).
@@ -162,6 +145,30 @@ namespace ht {
 			this->centerIj = center;
 		}
 
+		/**
+		 * 获取此对象的SVM置信度，[0.0，1.0]（较高=更可能是手）
+		 */
+		double getSVMConfidence() const;
+
+	private:
+		
+
+		/**
+		 * 如果“手簇”接触底部边缘，则为“真”，表示对象可能连接到用户的身体（手、手臂等）。
+		 */
+		bool touchingEdge() const;
+
+		/**
+		 * 如果手簇接触到屏幕左边缘的下半部分或屏幕下边缘的左半部分，则为true。
+		 * 接触边缘意味着物体可能与使用者的身体（手、臂等）相连。
+		 */
+		bool touchingLeftEdge() const;
+
+		/**
+		* 如果手簇接触到屏幕左边缘的下半部分或屏幕下边缘的左半部分，则为true。
+		* 接触边缘意味着物体可能与使用者的身体（手、臂等）相连。
+		*/
+		bool touchingRightEdge() const;
 
 	public:
 		/** 用于打标签 **/
@@ -273,12 +280,17 @@ namespace ht {
         double circleRadius;
 
 		/**
-		 * 存储手的主导方向
+		 * 存储手的主导方向二维向量
 		 */
         Point2f dominantDir;
 
 		/**
-		 * SVM分类器分配给这只手的置信值（in[0，1]），
+		 * 存储手的主导方向三维向量
+		 */
+		Vec3f dominantDirXYZ;
+
+		/**
+		 * SVM分类器分配给这只手的置信值（[0，1]），
 		 * 越高越可能是手
 		 */
         double svmConfidence;

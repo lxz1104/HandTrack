@@ -81,11 +81,11 @@ namespace ht {
 		 * 例如，如果你的相机能够获取的RGB图像且设置hasRGBMap()返回true,那么则必须要给参数rgb_map更新内容。
 		 * 注意：此方法必须要在派生类中实现！！！
 		 *
-		 * @param [out] xyz_map XYZ map (projection point cloud). CV_32FC3
-		 * @param [out] rgb_map RGB image. CV_8UC3
-		 * @param [out] ir_map IR image. CV_8UC1
-		 * @param [out] amp_map amplitude map. CV_32FC1
-		 * @param [out] flag_map flag map. CV_8UC1
+		 * @param [out] xyz_map 深度图像中所有点的XYZ坐标. CV_32FC3
+		 * @param [out] rgb_map RGB图像. CV_8UC3
+		 * @param [out] ir_map  红外图像. CV_8UC1
+		 * @param [out] amp_map 置信参数. CV_32FC1
+		 * @param [out] flag_map 其它图像. CV_8UC1
 		 *
 		 * @return [void]
 		 */

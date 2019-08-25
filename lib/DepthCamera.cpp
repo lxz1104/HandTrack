@@ -20,7 +20,8 @@ namespace ht {
         assert(captureInterrupt == true);
         captureInterrupt = false;
 
-		BOOST_LOG_TRIVIAL(info) << "正在启动深度图像获取线程...";
+		// 多线程捕获暂时关闭
+		//BOOST_LOG_TRIVIAL(info) << "正在启动深度图像获取线程...";
 		/*this->thPool.enqueue(&DepthCamera::captureThreadingHelper, this, fps_cap,
 			&captureInterrupt, remove_noise);*/
 		/*std::thread thd(&DepthCamera::captureThreadingHelper, this, fps_cap,
@@ -290,7 +291,7 @@ namespace ht {
 		BOOST_LOG_TRIVIAL(info) << "深度图像获取线程已启动";
         while (interrupt == nullptr || !(*interrupt)) {
             this->nextFrame(remove_noise);
-            // cap FPS
+            // 捕获图像的帧率
             if (fps_cap > 0) {
                 currTime = steady_clock::now();
                 steady_clock::duration delta = duration_cast<microseconds>(currTime - lastTime);

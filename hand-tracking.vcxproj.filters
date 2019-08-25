@@ -54,7 +54,7 @@
     <ClCompile Include="lib\FramePlane.cpp">
       <Filter>源文件\lib</Filter>
     </ClCompile>
-    <ClCompile Include="Label.cpp">
+    <ClCompile Include="lib\Label.cpp">
       <Filter>源文件\lib</Filter>
     </ClCompile>
   </ItemGroup>
@@ -107,7 +107,7 @@
     <ClInclude Include="include\FramePlane.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Label.h">
+    <ClInclude Include="include\Label.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

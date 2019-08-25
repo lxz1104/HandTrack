@@ -33,7 +33,7 @@ namespace ht {
         }
 		
 		
-        // 3. 漫水填充点云
+        // 2. 漫水填充点云
         std::shared_ptr<Hand> bestHandObject;
         float closestHandDist = FLT_MAX;
 
@@ -43,10 +43,6 @@ namespace ht {
         allIJPoints.reserve(size_t(R) * C);
         allXYZPoints.reserve(size_t(R) * C);
 
-#ifdef DEBUG
-        cv::Mat floodFillVis = cv::Mat::zeros(R, C, CV_8UC3);
-        int compID = 0;
-#endif
 
 		// 使用检测参数计算集群中的点的最小数量
         const int CLUSTER_MIN_POINTS = (int)(params->handClusterMinPoints * R * C);
@@ -76,19 +72,7 @@ namespace ht {
                             params, false, points_in_comp);
 						
                         if (ijPoints->size() < CLUSTER_MIN_POINTS) continue;
-						 
-#ifdef DEBUG
-                        cv::Vec3b color = util::paletteColor(compID++);
-                        for (uint i = 0; i < points_in_comp; ++i) {
-                            floodFillVis.at<Vec3b>(allIJPoints[i]) = color;
-                        }
 
-                        if (handPtr->getWristIJ().size() >= 2) {
-                            cv::circle(floodFillVis, handPtr->getWristIJ()[0], 5, cv::Scalar(100, 255, 255));
-                            cv::circle(floodFillVis, handPtr->getWristIJ()[1], 5, cv::Scalar(100, 255, 255));
-                            cv::circle(floodFillVis, handPtr->getPalmCenterIJ(), handPtr->getCircleRadius(), cv::Scalar(100, 50, 255));
-                        }
-#endif
 
                         if (handPtr->isValidHand()) {
                             float distance = handPtr->getDepth();
@@ -98,9 +82,6 @@ namespace ht {
                                 closestHandDist = distance;
                             }
 
-#ifdef DEBUG
-                            cv::polylines(floodFillVis, handPtr->getContour(), true, cv::Scalar(255, 255, 255));
-#endif
                             if (handPtr->getSVMConfidence() >
                                 params->handSVMHighConfidenceThresh ||
                                 !params->handUseSVM) {
@@ -115,7 +96,6 @@ namespace ht {
         }
 
         if (bestHandObject != nullptr) {
-            // if no hands surpass 'high confidence threshold', at least add one hand
 			// 如果没有手超过好置信值，则至少增加一只手
 			this->m_hands.push_back(bestHandObject);
         }
@@ -133,8 +113,5 @@ namespace ht {
                 return a->getDepth() < b->getDepth();
             });
         }
-#ifdef DEBUG
-        cv::imshow("[Hand Flood Fill Debug]", floodFillVis);
-#endif
     }
 }
