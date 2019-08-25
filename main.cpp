@@ -32,7 +32,7 @@ int main() {
 
 	int currFrame = 0;		// 当前位于第几帧
 
-	char chr[64] = { '/0' };
+	char chr[64] = { '0' };
 
 	// 主进程
 	while (true)
