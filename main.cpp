@@ -26,7 +26,7 @@ int main() {
 	using time_point = std::chrono::high_resolution_clock::time_point;
 
 	std::chrono::high_resolution_clock timer = std::chrono::high_resolution_clock();
-	time_point currCycleStartTime = timer.now(); // 当前周期的开始时间
+	time_point currCycleStartTime = std::chrono::high_resolution_clock::now(); // 当前周期的开始时间
 
 	float currFPS = 0.0;	// 当前的帧率
 
@@ -54,11 +54,9 @@ int main() {
 		handDetector->setParams(params);
 
 		if (showHands) {
-			if (showHands) {
-				handDetector->update(*camera);
-				hands = handDetector->getHands();
-			}
-		}
+            handDetector->update(*camera);
+            hands = handDetector->getHands();
+        }
 		
 
 		/**** 可视化部分 ****/
@@ -88,7 +86,7 @@ int main() {
 			}
 		}
 
-		if (showHands && hands.size() > 0) {
+		if (showHands && !hands.empty()) {
 			// 显示检测到的手的数量
 			cv::putText(handVisual, std::to_string(hands.size()) +
 				util::pluralize(" Hand", hands.size()),
@@ -97,7 +95,7 @@ int main() {
 
 		// update FPS
 		if (currFrame % FPS_CYCLE_FRAMES == 0) {
-			time_point now = timer.now();
+			time_point now = std::chrono::high_resolution_clock::now();
 			currFPS = (float)FPS_CYCLE_FRAMES * 1000.0f / std::chrono::duration_cast<ms>(now - currCycleStartTime).count();
 			currCycleStartTime = now;
 		}

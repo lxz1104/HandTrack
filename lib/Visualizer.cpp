@@ -1,8 +1,10 @@
 ﻿#include "stdafx.h"
 #include "Visualizer.h"
 #include "Util.h"
+#include <pcl/surface/gp3.h>
 
 namespace ht {
+    pcl::visualization::PCLVisualizer::Ptr Visualizer::viewer = nullptr;
 
 	/***
 	将矩阵值映射到[0，255]以供查看
@@ -31,8 +33,8 @@ namespace ht {
         if (output.rows == 0) output.create(normal_map.size() / resolution, CV_8UC3);
 
         for (int i = 0; i < output.rows; ++i) {
-            const Vec3f * inPtr = normal_map.ptr<Vec3f>(i * resolution);
-            Vec3b * outPtr = output.ptr<Vec3b>(i);
+            const auto * inPtr = normal_map.ptr<Vec3f>(i * resolution);
+            auto * outPtr = output.ptr<Vec3b>(i);
 
             for (int j = 0; j < output.cols; ++j) {
                 int jj = j * resolution;
@@ -79,7 +81,7 @@ namespace ht {
         Point2i center = hand->getPalmCenterIJ();
         Vec3f centerXYZ = hand->getPalmCenter();
 		// 绘制手掌中心（以掌心像素坐标为圆心画圆）
-        cv::circle(output, center, std::round(unitWid * 10), cv::Scalar(255, 0, 0));
+        cv::circle(output, center, static_cast<int>(std::round(unitWid * 10)), cv::Scalar(255, 0, 0));
 
 		// 绘制手腕(通过手腕两边的顶点(wrists[0] 代表左边, wrists[1]代表右边)的(i,j)坐标位置，绘制矩形来表示手腕的两点)
 		Point2i box = Point2i(int(unitWid * 6), int(unitWid * 6));
@@ -94,8 +96,8 @@ namespace ht {
 			cv::Scalar(255, 255, 0), int(unitWid * 1.5));
 
 		// 绘制手掌的最大内切圆
-        cv::circle(output, center, hand->getCircleRadius(), cv::Scalar(100, 100, 100), 
-            std::round(unitWid));
+        cv::circle(output, center, static_cast<int>(hand->getCircleRadius()), cv::Scalar(100, 100, 100),
+                   static_cast<int>(std::round(unitWid)));
 
         const std::vector<Point2i> & fingers = hand->getFingersIJ();	// 被检测到的手指的指尖的像素坐标
         const std::vector<Point2i> & defects = hand->getDefectsIJ();	// 缺陷点像素坐标
@@ -107,7 +109,7 @@ namespace ht {
         {
 			// 画手指
             cv::line(output, defects[i], fingers[i], cv::Scalar(0, 150, 255), roundf(unitWid * 2));
-            cv::circle(output, fingers[i], roundf(unitWid * 7), cv::Scalar(0, 0, 255), -1);
+            cv::circle(output, fingers[i], static_cast<int>(roundf(unitWid * 7)), cv::Scalar(0, 0, 255), -1);
 
             std::stringstream sstr;
 			// 缺陷点到指尖距离（利用xyz坐标计算得到的）
@@ -120,7 +122,7 @@ namespace ht {
                 0.7 * unitWid, cv::Scalar(0, 255, 255), 1);
 
 			// 可视化缺陷点
-            cv::circle(output, defects[i], roundf(unitWid * 5), cv::Scalar(255, 0, 200), -1);
+            cv::circle(output, defects[i], static_cast<int>(roundf(unitWid * 5)), cv::Scalar(255, 0, 200), -1);
 			// 绘制缺陷点到掌心的连线
             cv::line(output, defects[i], center, cv::Scalar(255, 0, 200), roundf(unitWid * 2));
 
@@ -136,7 +138,7 @@ namespace ht {
 		// 绘制主方向箭头
         Point2f dir = hand->getDominantDirection();
         cv::arrowedLine(output, Point2f(center), Point2f(center) + dir * 50,
-            cv::Scalar(200, 200, 120), std::round(unitWid * 3), 8, 0, 0.3);
+                        cv::Scalar(200, 200, 120), static_cast<int>(std::round(unitWid * 3)), 8, 0, 0.3);
             
         if (display < FLT_MAX) {
 			// 显示文本信息: 需要在手部中心显示的自定义数值（后期用于区分左右手）
@@ -166,7 +168,7 @@ namespace ht {
 
         for (int r = 0; r < input_mat.rows; r++)
         {
-            const Vec3f * ptr = input_mat.ptr<Vec3f>(r);
+            const auto * ptr = input_mat.ptr<Vec3f>(r);
 
             for (int c = 0; c < input_mat.cols; c++)
             {
@@ -189,10 +191,93 @@ namespace ht {
     }
 
 
-    void Visualizer::visualizePlanePoints(cv::Mat &input_mat, std::vector<Point2i> indicies)
+    void Visualizer::visualizePlanePoints(cv::Mat &input_mat, const std::vector<Point2i>& indicies)
     {
-        for (auto i = 0; i < indicies.size(); i++) {
-            input_mat.at<uchar>(indicies[i].y, indicies[i].x) = static_cast<uchar>(255);
+        for (auto & indicie : indicies) {
+            input_mat.at<uchar>(indicie.y, indicie.x) = static_cast<uchar>(255);
         }
+    }
+
+    void Visualizer::visulizePolygonMesh(const pcl::PointCloud<pcl::PointXYZ>::Ptr& cloud)
+    {
+        if (cloud.get()->width == 0)
+        {
+            return;
+        }
+        initPCLViewer();
+
+        // Normal estimation*
+        pcl::NormalEstimation<pcl::PointXYZ, pcl::Normal> n;
+        pcl::PointCloud<pcl::Normal>::Ptr normals(new pcl::PointCloud<pcl::Normal>);
+        pcl::search::KdTree<pcl::PointXYZ>::Ptr tree(new pcl::search::KdTree<pcl::PointXYZ>);
+        tree->setInputCloud(cloud);
+        n.setInputCloud(cloud);
+        n.setSearchMethod(tree);
+        n.setKSearch(20);
+        n.compute(*normals);
+        //* normals should not contain the point normals + surface curvatures
+
+        // Concatenate the XYZ and normal fields*
+        pcl::PointCloud<pcl::PointNormal>::Ptr cloud_with_normals(new pcl::PointCloud<pcl::PointNormal>);
+        pcl::concatenateFields(*cloud, *normals, *cloud_with_normals);
+        //* cloud_with_normals = cloud + normals
+
+        // Create search tree*
+        pcl::search::KdTree<pcl::PointNormal>::Ptr tree2(new pcl::search::KdTree<pcl::PointNormal>);
+        tree2->setInputCloud(cloud_with_normals);
+
+        // Initialize objects
+        pcl::GreedyProjectionTriangulation<pcl::PointNormal> gp3;
+        pcl::PolygonMesh triangles;
+
+        // Set the maximum distance between connected points (maximum edge length)
+        gp3.setSearchRadius(0.025);
+
+        // Set typical values for the parameters
+        gp3.setMu(2.5);
+        gp3.setMaximumNearestNeighbors(100);
+        gp3.setMaximumSurfaceAngle(M_PI / 4); // 45 degrees
+        gp3.setMinimumAngle(M_PI / 18); // 10 degrees
+        gp3.setMaximumAngle(2 * M_PI / 3); // 120 degrees
+        gp3.setNormalConsistency(false);
+
+        // Get result
+        gp3.setInputCloud(cloud_with_normals);
+        gp3.setSearchMethod(tree2);
+        gp3.reconstruct(triangles);
+
+        Visualizer::viewer->setBackgroundColor(0, 0, 0);
+
+        if (!Visualizer::viewer->updatePolygonMesh(triangles))
+            Visualizer::viewer->addPolygonMesh(triangles);
+
+        Visualizer::viewer->spinOnce();
+    }
+
+    bool Visualizer::initPCLViewer() {
+        if (Visualizer::viewer != nullptr) return false;
+        Visualizer::viewer = boost::make_shared<pcl::visualization::PCLVisualizer>("3D Viewport");
+        Visualizer::viewer->registerKeyboardCallback([](const pcl::visualization::KeyboardEvent & evt) {
+            // add handler to allow quit
+            unsigned char k = evt.getKeyCode();
+            if (k == 'Q' || k == 'q' || k == 27) {
+                std::exit(0);
+            }
+        });
+        return Visualizer::viewer != nullptr;
+    }
+
+    int Visualizer::createPCLViewport(double xmin, double ymin, double xmax, double ymax)
+    {
+        initPCLViewer();
+        int id;
+        Visualizer::viewer->createViewPort(xmin, ymin, xmax, ymax, id);
+        return id;
+    }
+
+    pcl::visualization::PCLVisualizer::Ptr Visualizer::getPCLVisualizer()
+    {
+        initPCLViewer();
+        return Visualizer::viewer;
     }
 }

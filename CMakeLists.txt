@@ -3,7 +3,7 @@ project(hand-label)
 
 set(CMAKE_CXX_STANDARD 11)
 
-set(CMAKE_BUILD_TYPE Release)
+#set(CMAKE_BUILD_TYPE Release)
 
 #设置头文件所在目录
 set(INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include")
@@ -24,21 +24,6 @@ include_directories(
 #设置cmake模块所在路径
 set( CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake_modules" )
 
-#开启Boost库
-find_package( Boost REQUIRED COMPONENTS
-        system
-        filesystem
-        log
-        thread
-        )
-if( Boost_FOUND )
-    message( STATUS "Found Eigen: ${EIGEN_INCLUDE_DIRS}" )
-endif( Boost_FOUND )
-
-#设置cmake模块所在路径
-#set( CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake_modules" )
-set( Boost_USE_STATIC_LIBS ON )
-set( Boost_USE_STATIC ON )
 
 #检查OpenCV库
 find_package( OpenCV REQUIRED )
@@ -53,24 +38,51 @@ if( Eigen_FOUND )
     message( STATUS "Found Eigen: ${EIGEN_INCLUDE_DIRS}" )
 endif( Eigen_FOUND )
 
+#检查PCL库
+find_package( PCL REQUIRED )
+if( PCL_FOUND )
+    message( STATUS "Found PCL: ${PCL_INCLUDE_DIRS}" )
+    link_directories(${PCL_LIBRARY_DIRS})
+endif( PCL_FOUND )
+
+#开启Boost库
+#set( Boost_USE_STATIC_LIBS ON )
+#set( Boost_USE_STATIC ON )
+ADD_DEFINITIONS(-DBOOST_LOG_DYN_LINK)
+find_package( Boost REQUIRED COMPONENTS
+        system
+        filesystem
+        log
+        thread
+        )
+if( Boost_FOUND )
+    message( STATUS "Found Boost: ${Boost_LIBRARIES}" )
+endif( Boost_FOUND )
+
 #添加头文件
 include_directories(
-        ${EIGEN_INCLUDE_DIRS}
         ${OpenCV_INCLUDE_DIRS}
         ${INCLUDE_DIR}
+        ${PCL_INCLUDE_DIRS}
+        ${Boost_INCLUDE_DIRS}
 )
 
 #添加库文件
 set(
         DEPENDENCIES
-        ${Boost_LIBRARIES}
         ${OpenCV_LIBRARIES}
         ${royale_LIBS}
+        ${PCL_LIBRARIES}
+        ${Boost_LIBRARIES}
 )
 
-ADD_DEFINITIONS(-DBOOST_LOG_DYN_LINK)
+add_definitions(
+        ${PCL_DEFINITIONS}
+)
+
 
 aux_source_directory(./lib SRC)
+
 
 add_executable(hand-label ${SRC} main.cpp)
 
