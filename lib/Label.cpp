@@ -2,287 +2,287 @@
 #include "Util.h"
 
 namespace ht {
-	/**
-	 * ’Î∂‘»±œ›µ„µƒ∏ˆ ˝∂‘Ãÿ∂® ÷ ∆µƒ ÷÷∏º‚£¨◊Û”“ ÷ ∂±£¨ ÷–ƒ ÷±≥Ω¯––±Í«©
-	 */
-	void Label::labelFingers(const cv::Mat& background, cv::Mat& output, Hand* hand)
-	{
-		Point2i center = hand->getPalmCenterIJ();
-		Vec3f centerXYZ = hand->getPalmCenter();
-		const std::vector<Vec3f> fingersXYZSort = hand->getFingersSort();
-		const std::vector<Point2i> fingersIJSort = hand->getFingersIJSort();
-		const std::vector<Vec3f> defectsXYZSort = hand->getDefectsSort();
-		const std::vector<Point2i> defectsIJSort = hand->getDefectsIJSort();
-		const Vec3f wristmidXYZ = hand->getwristmid();
-		const Point2i wristmidIJ = hand->getwristmidIJ();
-		const Point2i armmidpoint = hand->getarmmidIJ();
-		std::string fingersname[5] = { "TF", "IF", "MF", "RF", "LF" };
+    /**
+     * ÈíàÂØπÁº∫Èô∑ÁÇπÁöÑ‰∏™Êï∞ÂØπÁâπÂÆöÊâãÂäøÁöÑÊâãÊåáÂ∞ñÔºåÂ∑¶Âè≥ÊâãËØÜÂà´ÔºåÊâãÂøÉÊâãËÉåËøõË°åÊ†áÁ≠æ
+     */
+    void Label::labelFingers(const cv::Mat& background, cv::Mat& output, Hand* hand)
+    {
+        Point2i center = hand->getPalmCenterIJ();
+        Vec3f centerXYZ = hand->getPalmCenter();
+        const std::vector<Vec3f> fingersXYZSort = hand->getFingersSort();
+        const std::vector<Point2i> fingersIJSort = hand->getFingersIJSort();
+        const std::vector<Vec3f> defectsXYZSort = hand->getDefectsSort();
+        const std::vector<Point2i> defectsIJSort = hand->getDefectsIJSort();
+        const Vec3f wristmidXYZ = hand->getwristmid();
+        const Point2i wristmidIJ = hand->getwristmidIJ();
+        const Point2i armmidpoint = hand->getarmmidIJ();
+        std::string fingersname[5] = { "TF", "IF", "MF", "RF", "LF" };
 
-		//Õ®π˝ ÷±€÷–µ„”Î ÷ÕÛ÷–µ„¡¨œﬂ”ÎœÒÀÿ◊¯±ÍœµX÷·µƒº–Ω«µƒ”‡œ“÷µ≈–∂œ◊Û”“ ÷
-		Point2i Armorientation = wristmidIJ - armmidpoint;
-		Point2i xaxis = Point2i(1, 0);
-		float unitWid = std::min((float)background.cols / 640, 1.75f);
-		Point2i box = Point2i(static_cast<int>(unitWid * 6), static_cast<int>(unitWid * 6));
-		double cosangle = Armorientation.dot(xaxis) / (sqrt(Armorientation.x * Armorientation.x + Armorientation.y * Armorientation.y) * sqrt(xaxis.x * xaxis.x + xaxis.y * xaxis.y));
+        //ÈÄöËøáÊâãËáÇ‰∏≠ÁÇπ‰∏éÊâãËÖï‰∏≠ÁÇπËøûÁ∫ø‰∏éÂÉèÁ¥†ÂùêÊ†áÁ≥ªXËΩ¥ÁöÑÂ§πËßíÁöÑ‰ΩôÂº¶ÂÄºÂà§Êñ≠Â∑¶Âè≥Êâã
+        Point2i Armorientation = wristmidIJ - armmidpoint;
+        Point2i xaxis = Point2i(1, 0);
+        float unitWid = std::min((float)background.cols / 640, 1.75f);
+        Point2i box = Point2i(static_cast<int>(unitWid * 6), static_cast<int>(unitWid * 6));
+        double cosangle = Armorientation.dot(xaxis) / (sqrt(Armorientation.x * Armorientation.x + Armorientation.y * Armorientation.y) * sqrt(xaxis.x * xaxis.x + xaxis.y * xaxis.y));
 
-		cv::rectangle(output, armmidpoint - box, armmidpoint + box,
-			cv::Scalar(255, 255, 0), static_cast<int>(unitWid * 1.5));
-		cv::line(output, armmidpoint, wristmidIJ, cv::Scalar(255, 0, 200), static_cast<int>(roundf(unitWid * 2)));
+        cv::rectangle(output, armmidpoint - box, armmidpoint + box,
+                      cv::Scalar(255, 255, 0), static_cast<int>(unitWid * 1.5));
+        cv::line(output, armmidpoint, wristmidIJ, cv::Scalar(255, 0, 200), static_cast<int>(roundf(unitWid * 2)));
 
-		//ŒÂ∏ˆ ÷÷∏»´≤ø…Ïø™£¨£¨ø…«¯∑÷ ÷–ƒ ÷±≥
-		if (hand->getFingersIJSort().size() == 5 && hand->getDefectsIJSort().size() == 5)
-		{
-			double dist0 = util::euclideanDistance(centerXYZ, defectsXYZSort[0]);
-			double dist1 = util::euclideanDistance(centerXYZ, defectsXYZSort[defectsXYZSort.size() - 1]);
-			//std::cout<< "Ω«∂»µƒ”‡œ“÷µ£∫" << incldedangle << std::endl;
-			//◊Û ÷
-			if (cosangle > 0)
-			{
-				// ÷±≥
-				if (dist0 < dist1)
-				{
-					cv::putText(output, "L_HB", center, cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(0, 255, 255));
-					for (size_t i = 0; i < fingersIJSort.size(); i++)
-					{
-						cv::putText(output, fingersname[i], fingersIJSort[i], cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(0, 255, 255));
-					}
-				}
-				// ÷–ƒ
-				if (dist0 > dist1)
-				{
-					cv::putText(output, "L_HP", center, cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(0, 255, 255));
-					for (size_t i = 0; i < fingersIJSort.size(); i++)
-					{
-						cv::putText(output, fingersname[i], fingersIJSort[fingersIJSort.size() - 1 - i], cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(0, 255, 255));
-					}
-				}
-			}
-			//”“ ÷
-			if (cosangle < 0)
-			{
-				// ÷–ƒ
-				if (dist0 < dist1)
-				{
-					cv::putText(output, "R_HP", center, cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(0, 255, 255));
-					for (size_t i = 0; i < fingersIJSort.size(); i++)
-					{
-						cv::putText(output, fingersname[i], fingersIJSort[i], cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(0, 255, 255));
-					}
-				}
-				// ÷±≥
-				if (dist0 > dist1)
-				{
-					cv::putText(output, "R_HB", center, cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(0, 255, 255));
-					for (size_t i = 0; i < fingersIJSort.size(); i++)
-					{
-						cv::putText(output, fingersname[i], fingersIJSort[fingersIJSort.size() - 1 - i], cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(0, 255, 255));
-					}
-				}
-			}
-		}
+        //‰∫î‰∏™ÊâãÊåáÂÖ®ÈÉ®‰º∏ÂºÄÔºåÔºåÂèØÂå∫ÂàÜÊâãÂøÉÊâãËÉå
+        if (hand->getFingersIJSort().size() == 5 && hand->getDefectsIJSort().size() == 5)
+        {
+            double dist0 = util::euclideanDistance(centerXYZ, defectsXYZSort[0]);
+            double dist1 = util::euclideanDistance(centerXYZ, defectsXYZSort[defectsXYZSort.size() - 1]);
+            //std::cout<< "ËßíÂ∫¶ÁöÑ‰ΩôÂº¶ÂÄºÔºö" << incldedangle << std::endl;
+            //Â∑¶Êâã
+            if (cosangle > 0)
+            {
+                //ÊâãËÉå
+                if (dist0 < dist1)
+                {
+                    cv::putText(output, "L_HB", center, cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(0, 255, 255));
+                    for (size_t i = 0; i < fingersIJSort.size(); i++)
+                    {
+                        cv::putText(output, fingersname[i], fingersIJSort[i], cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(0, 255, 255));
+                    }
+                }
+                //ÊâãÂøÉ
+                if (dist0 > dist1)
+                {
+                    cv::putText(output, "L_HP", center, cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(0, 255, 255));
+                    for (size_t i = 0; i < fingersIJSort.size(); i++)
+                    {
+                        cv::putText(output, fingersname[i], fingersIJSort[fingersIJSort.size() - 1 - i], cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(0, 255, 255));
+                    }
+                }
+            }
+            //Âè≥Êâã
+            if (cosangle < 0)
+            {
+                //ÊâãÂøÉ
+                if (dist0 < dist1)
+                {
+                    cv::putText(output, "R_HP", center, cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(0, 255, 255));
+                    for (size_t i = 0; i < fingersIJSort.size(); i++)
+                    {
+                        cv::putText(output, fingersname[i], fingersIJSort[i], cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(0, 255, 255));
+                    }
+                }
+                //ÊâãËÉå
+                if (dist0 > dist1)
+                {
+                    cv::putText(output, "R_HB", center, cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(0, 255, 255));
+                    for (size_t i = 0; i < fingersIJSort.size(); i++)
+                    {
+                        cv::putText(output, fingersname[i], fingersIJSort[fingersIJSort.size() - 1 - i], cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(0, 255, 255));
+                    }
+                }
+            }
+        }
 
-		//…Ï≥ˆÀƒ∏ˆ ÷÷∏£®’Î∂‘Ãÿ∂® ÷ ∆£∫¥” ≥÷∏µΩ–°ƒ¥÷∏£¨≤ª∞¸¿®¥Ûƒ¥÷∏£©£¨ø…«¯∑÷ ÷–ƒ ÷±≥
-		if (fingersXYZSort.size() == 4 && defectsXYZSort.size() == 4)
-		{
-			double dist0 = util::euclideanDistance(centerXYZ, fingersXYZSort[0]);
-			double dist1 = util::euclideanDistance(centerXYZ, fingersXYZSort[3]);
+        //‰º∏Âá∫Âõõ‰∏™ÊâãÊåáÔºàÈíàÂØπÁâπÂÆöÊâãÂäøÔºö‰ªéÈ£üÊåáÂà∞Â∞èÊãáÊåáÔºå‰∏çÂåÖÊã¨Â§ßÊãáÊåáÔºâÔºåÂèØÂå∫ÂàÜÊâãÂøÉÊâãËÉå
+        if (fingersXYZSort.size() == 4 && defectsXYZSort.size() == 4)
+        {
+            double dist0 = util::euclideanDistance(centerXYZ, fingersXYZSort[0]);
+            double dist1 = util::euclideanDistance(centerXYZ, fingersXYZSort[3]);
 
-			//◊Û ÷
-			if (cosangle > 0)
-			{
-				// ÷±≥
-				if (dist0 > dist1)
-				{
-					cv::putText(output, "L_HB", center, cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(0, 255, 255));
-					for (size_t i = 0; i < fingersIJSort.size(); i++)
-					{
-						cv::putText(output, fingersname[i + 1], fingersIJSort[i], cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(0, 255, 255));
-					}
-				}
-				// ÷–ƒ
-				if (dist0 < dist1)
-				{
-					cv::putText(output, "L_HP", center, cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(0, 255, 255));
-					for (size_t i = 0; i < fingersIJSort.size(); i++)
-					{
-						cv::putText(output, fingersname[i + 1], fingersIJSort[fingersIJSort.size() - 1 - i], cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(0, 255, 255));
-					}
-				}
-			}
-			//”“ ÷
-			if (cosangle < 0)
-			{
-				// ÷–ƒ
-				if (dist0 > dist1)
-				{
-					cv::putText(output, "R_HP", center, cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(0, 255, 255));
-					for (size_t i = 0; i < fingersIJSort.size(); i++)
-					{
-						cv::putText(output, fingersname[i + 1], fingersIJSort[i], cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(0, 255, 255));
-					}
-				}
-				// ÷±≥
-				if (dist0 < dist1)
-				{
-					cv::putText(output, "R_HB", center, cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(0, 255, 255));
-					for (size_t i = 0; i < fingersIJSort.size(); i++)
-					{
-						cv::putText(output, fingersname[i + 1], fingersIJSort[fingersIJSort.size() - 1 - i], cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(0, 255, 255));
-					}
-				}
-			}
-		}
+            //Â∑¶Êâã
+            if (cosangle > 0)
+            {
+                //ÊâãËÉå
+                if (dist0 > dist1)
+                {
+                    cv::putText(output, "L_HB", center, cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(0, 255, 255));
+                    for (size_t i = 0; i < fingersIJSort.size(); i++)
+                    {
+                        cv::putText(output, fingersname[i + 1], fingersIJSort[i], cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(0, 255, 255));
+                    }
+                }
+                //ÊâãÂøÉ
+                if (dist0 < dist1)
+                {
+                    cv::putText(output, "L_HP", center, cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(0, 255, 255));
+                    for (size_t i = 0; i < fingersIJSort.size(); i++)
+                    {
+                        cv::putText(output, fingersname[i + 1], fingersIJSort[fingersIJSort.size() - 1 - i], cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(0, 255, 255));
+                    }
+                }
+            }
+            //Âè≥Êâã
+            if (cosangle < 0)
+            {
+                //ÊâãÂøÉ
+                if (dist0 > dist1)
+                {
+                    cv::putText(output, "R_HP", center, cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(0, 255, 255));
+                    for (size_t i = 0; i < fingersIJSort.size(); i++)
+                    {
+                        cv::putText(output, fingersname[i + 1], fingersIJSort[i], cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(0, 255, 255));
+                    }
+                }
+                //ÊâãËÉå
+                if (dist0 < dist1)
+                {
+                    cv::putText(output, "R_HB", center, cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(0, 255, 255));
+                    for (size_t i = 0; i < fingersIJSort.size(); i++)
+                    {
+                        cv::putText(output, fingersname[i + 1], fingersIJSort[fingersIJSort.size() - 1 - i], cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(0, 255, 255));
+                    }
+                }
+            }
+        }
 
-		//…Ï≥ˆ»˝∏ˆ ÷÷∏£®’Î∂‘Ãÿ∂® ÷ ∆£∫÷–÷∏µΩ–°ƒ¥÷∏£¨≤ª∞¸¿® ≥÷∏∫Õ¥Ûƒ¥÷∏£©£¨ø…«¯∑÷ ÷–ƒ ÷±≥
-		if (fingersXYZSort.size() == 3 && defectsXYZSort.size() == 3)
-		{
-			double dist0 = util::euclideanDistance(wristmidXYZ, fingersXYZSort[0]);
-			double dist1 = util::euclideanDistance(wristmidXYZ, fingersXYZSort[2]);
-			//◊Û ÷
-			if (cosangle > 0)
-			{
-				// ÷±≥
-				if (dist0 > dist1)
-				{
-					cv::putText(output, "L_HB", center, cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(0, 255, 255));
-					for (size_t i = 0; i < fingersIJSort.size(); i++)
-					{
-						cv::putText(output, fingersname[i + 2], fingersIJSort[i], cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(0, 255, 255));
-					}
-				}
-				// ÷–ƒ
-				if (dist0 < dist1)
-				{
-					cv::putText(output, "L_HP", center, cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(0, 255, 255));
-					for (size_t i = 0; i < fingersIJSort.size(); i++)
-					{
-						cv::putText(output, fingersname[i + 2], fingersIJSort[fingersIJSort.size() - 1 - i], cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(0, 255, 255));
-					}
-				}
-			}
-			//”“ ÷
-			if (cosangle < 0)
-			{
-				// ÷±≥
-				if (dist0 < dist1)
-				{
-					cv::putText(output, "R_HB", center, cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(0, 255, 255));
-					for (size_t i = 0; i < fingersIJSort.size(); i++)
-					{
-						cv::putText(output, fingersname[i + 2], fingersIJSort[fingersIJSort.size() - 1 - i], cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(0, 255, 255));
-					}
-				}
-				// ÷–ƒ
-				if (dist0 > dist1)
-				{
-					cv::putText(output, "R_HP", center, cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(0, 255, 255));
-					for (size_t i = 0; i < fingersIJSort.size(); i++)
-					{
-						cv::putText(output, fingersname[i + 2], fingersIJSort[i], cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(0, 255, 255));
-					}
-				}
-			}
-		}
+        //‰º∏Âá∫‰∏â‰∏™ÊâãÊåáÔºàÈíàÂØπÁâπÂÆöÊâãÂäøÔºö‰∏≠ÊåáÂà∞Â∞èÊãáÊåáÔºå‰∏çÂåÖÊã¨È£üÊåáÂíåÂ§ßÊãáÊåáÔºâÔºåÂèØÂå∫ÂàÜÊâãÂøÉÊâãËÉå
+        if (fingersXYZSort.size() == 3 && defectsXYZSort.size() == 3)
+        {
+            double dist0 = util::euclideanDistance(wristmidXYZ, fingersXYZSort[0]);
+            double dist1 = util::euclideanDistance(wristmidXYZ, fingersXYZSort[2]);
+            //Â∑¶Êâã
+            if (cosangle > 0)
+            {
+                //ÊâãËÉå
+                if (dist0 > dist1)
+                {
+                    cv::putText(output, "L_HB", center, cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(0, 255, 255));
+                    for (size_t i = 0; i < fingersIJSort.size(); i++)
+                    {
+                        cv::putText(output, fingersname[i + 2], fingersIJSort[i], cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(0, 255, 255));
+                    }
+                }
+                //ÊâãÂøÉ
+                if (dist0 < dist1)
+                {
+                    cv::putText(output, "L_HP", center, cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(0, 255, 255));
+                    for (size_t i = 0; i < fingersIJSort.size(); i++)
+                    {
+                        cv::putText(output, fingersname[i + 2], fingersIJSort[fingersIJSort.size() - 1 - i], cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(0, 255, 255));
+                    }
+                }
+            }
+            //Âè≥Êâã
+            if (cosangle < 0)
+            {
+                //ÊâãËÉå
+                if (dist0 < dist1)
+                {
+                    cv::putText(output, "R_HB", center, cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(0, 255, 255));
+                    for (size_t i = 0; i < fingersIJSort.size(); i++)
+                    {
+                        cv::putText(output, fingersname[i + 2], fingersIJSort[fingersIJSort.size() - 1 - i], cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(0, 255, 255));
+                    }
+                }
+                //ÊâãÂøÉ
+                if (dist0 > dist1)
+                {
+                    cv::putText(output, "R_HP", center, cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(0, 255, 255));
+                    for (size_t i = 0; i < fingersIJSort.size(); i++)
+                    {
+                        cv::putText(output, fingersname[i + 2], fingersIJSort[i], cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(0, 255, 255));
+                    }
+                }
+            }
+        }
 
-		//…Ï≥ˆ¡Ω∏ˆ ÷÷∏£®’Î∂‘Ãÿ∂® ÷ ∆£∫ƒÛ∫œ∂Ø◊˜£®¥Ûƒ¥÷∏∫Õ ≥÷∏£©£¨YES∂Ø◊˜£® ≥÷∏∫Õ÷–÷∏£©£©£¨YES∂Ø◊˜ø…«¯∑÷ ÷–ƒ ÷±≥£¨ƒÛ∫œ∂Ø◊˜÷µ«¯∑÷◊Û”“ ÷
-		if (fingersXYZSort.size() == 2 && defectsXYZSort.size() == 2)
-		{
-			double dist0 = util::euclideanDistance(defectsXYZSort[1], fingersXYZSort[0]);
-			double dist1 = util::euclideanDistance(defectsXYZSort[1], fingersXYZSort[1]);
-			double dist2 = util::euclideanDistance(centerXYZ, fingersXYZSort[0]);
-			double dist3 = util::euclideanDistance(centerXYZ, fingersXYZSort[1]);
-			//◊Û ÷
-			if (cosangle > 0)
-			{
-				//ƒÛ∫œ∂Ø◊˜
-				if (dist2 < 0.105)
-				{
-					cv::putText(output, "LH", center, cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(0, 255, 255));
-					for (size_t i = 0; i < fingersIJSort.size(); i++)
-					{
-						cv::putText(output, fingersname[i], fingersIJSort[i], cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(0, 255, 255));
-					}
-				}
-				else
-				{
-					//Yes∂Ø◊˜
-					// ÷±≥
-					if (dist0 < dist1)
-					{
-						cv::putText(output, "L_HB", center, cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(0, 255, 255));
-						for (size_t i = 0; i < fingersIJSort.size(); i++)
-						{
-							cv::putText(output, fingersname[i + 1], fingersIJSort[i], cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(0, 255, 255));
-						}
-					}
-					// ÷–ƒ
-					if (dist0 > dist1)
-					{
-						cv::putText(output, "L_HP", center, cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(0, 255, 255));
-						for (size_t i = 0; i < fingersIJSort.size(); i++)
-						{
-							cv::putText(output, fingersname[i + 1], fingersIJSort[fingersIJSort.size() - 1 - i], cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(0, 255, 255));
-						}
-					}
-				}
-			}
-			//”“ ÷
-			if (cosangle < 0)
-			{
-				//ƒÛ∫œ∂Ø◊˜
-				if (dist3 < 0.105)
-				{
-					cv::putText(output, "RH", center, cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(0, 255, 255));
-					for (size_t i = 0; i < fingersIJSort.size(); i++)
-					{
-						cv::putText(output, fingersname[i], fingersIJSort[fingersIJSort.size() - 1 - i], cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(0, 255, 255));
-					}
-				}
-				else
-				{
-					//Yes∂Ø◊˜
-					// ÷±≥
-					if (dist0 > dist1)
-					{
-						cv::putText(output, "R_HB", center, cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(0, 255, 255));
-						for (size_t i = 0; i < fingersIJSort.size(); i++)
-						{
-							cv::putText(output, fingersname[i + 1], fingersIJSort[fingersIJSort.size() - 1 - i], cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(0, 255, 255));
-						}
-					}
-					// ÷–ƒ
-					if (dist0 < dist1)
-					{
-						cv::putText(output, "R_HP", center, cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(0, 255, 255));
-						for (size_t i = 0; i < fingersIJSort.size(); i++)
-						{
-							cv::putText(output, fingersname[i + 1], fingersIJSort[i], cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(0, 255, 255));
-						}
-					}
-				}
-			}
-		}
+        //‰º∏Âá∫‰∏§‰∏™ÊâãÊåáÔºàÈíàÂØπÁâπÂÆöÊâãÂäøÔºöÊçèÂêàÂä®‰ΩúÔºàÂ§ßÊãáÊåáÂíåÈ£üÊåáÔºâÔºåYESÂä®‰ΩúÔºàÈ£üÊåáÂíå‰∏≠ÊåáÔºâÔºâÔºåYESÂä®‰ΩúÂèØÂå∫ÂàÜÊâãÂøÉÊâãËÉåÔºåÊçèÂêàÂä®‰ΩúÂÄºÂå∫ÂàÜÂ∑¶Âè≥Êâã
+        if (fingersXYZSort.size() == 2 && defectsXYZSort.size() == 2)
+        {
+            double dist0 = util::euclideanDistance(defectsXYZSort[1], fingersXYZSort[0]);
+            double dist1 = util::euclideanDistance(defectsXYZSort[1], fingersXYZSort[1]);
+            double dist2 = util::euclideanDistance(centerXYZ, fingersXYZSort[0]);
+            double dist3 = util::euclideanDistance(centerXYZ, fingersXYZSort[1]);
+            //Â∑¶Êâã
+            if (cosangle > 0)
+            {
+                //ÊçèÂêàÂä®‰Ωú
+                if (dist2 < 0.105)
+                {
+                    cv::putText(output, "LH", center, cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(0, 255, 255));
+                    for (size_t i = 0; i < fingersIJSort.size(); i++)
+                    {
+                        cv::putText(output, fingersname[i], fingersIJSort[i], cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(0, 255, 255));
+                    }
+                }
+                else
+                {
+                    //YesÂä®‰Ωú
+                    //ÊâãËÉå
+                    if (dist0 < dist1)
+                    {
+                        cv::putText(output, "L_HB", center, cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(0, 255, 255));
+                        for (size_t i = 0; i < fingersIJSort.size(); i++)
+                        {
+                            cv::putText(output, fingersname[i + 1], fingersIJSort[i], cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(0, 255, 255));
+                        }
+                    }
+                    //ÊâãÂøÉ
+                    if (dist0 > dist1)
+                    {
+                        cv::putText(output, "L_HP", center, cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(0, 255, 255));
+                        for (size_t i = 0; i < fingersIJSort.size(); i++)
+                        {
+                            cv::putText(output, fingersname[i + 1], fingersIJSort[fingersIJSort.size() - 1 - i], cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(0, 255, 255));
+                        }
+                    }
+                }
+            }
+            //Âè≥Êâã
+            if (cosangle < 0)
+            {
+                //ÊçèÂêàÂä®‰Ωú
+                if (dist3 < 0.105)
+                {
+                    cv::putText(output, "RH", center, cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(0, 255, 255));
+                    for (size_t i = 0; i < fingersIJSort.size(); i++)
+                    {
+                        cv::putText(output, fingersname[i], fingersIJSort[fingersIJSort.size() - 1 - i], cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(0, 255, 255));
+                    }
+                }
+                else
+                {
+                    //YesÂä®‰Ωú
+                    //ÊâãËÉå
+                    if (dist0 > dist1)
+                    {
+                        cv::putText(output, "R_HB", center, cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(0, 255, 255));
+                        for (size_t i = 0; i < fingersIJSort.size(); i++)
+                        {
+                            cv::putText(output, fingersname[i + 1], fingersIJSort[fingersIJSort.size() - 1 - i], cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(0, 255, 255));
+                        }
+                    }
+                    //ÊâãÂøÉ
+                    if (dist0 < dist1)
+                    {
+                        cv::putText(output, "R_HP", center, cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(0, 255, 255));
+                        for (size_t i = 0; i < fingersIJSort.size(); i++)
+                        {
+                            cv::putText(output, fingersname[i + 1], fingersIJSort[i], cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(0, 255, 255));
+                        }
+                    }
+                }
+            }
+        }
 
-		//“ª∏ˆ ÷÷∏£®’Î∂‘Ãÿ∂® ÷ ∆£∫ ≥÷∏µ„ª˜ ÷ ∆£©£¨÷ª«¯∑÷◊Û”“ ÷
-		if (fingersXYZSort.size() == 1 && defectsXYZSort.size() == 1)
-		{
-			//◊Û ÷
-			if (cosangle > 0)
-			{
-				cv::putText(output, "LH", center, cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(0, 255, 255));
-				cv::putText(output, "IF", fingersIJSort[0], cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(0, 255, 255));
-			}
-			//”“ ÷
-			if (cosangle < 0)
-			{
-				cv::putText(output, "RH", center, cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(0, 255, 255));
-				cv::putText(output, "IF", fingersIJSort[0], cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(0, 255, 255));
-			}
-		}
+        //‰∏Ä‰∏™ÊâãÊåáÔºàÈíàÂØπÁâπÂÆöÊâãÂäøÔºöÈ£üÊåáÁÇπÂáªÊâãÂäøÔºâÔºåÂè™Âå∫ÂàÜÂ∑¶Âè≥Êâã
+        if (fingersXYZSort.size() == 1 && defectsXYZSort.size() == 1)
+        {
+            //Â∑¶Êâã
+            if (cosangle > 0)
+            {
+                cv::putText(output, "LH", center, cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(0, 255, 255));
+                cv::putText(output, "IF", fingersIJSort[0], cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(0, 255, 255));
+            }
+            //Âè≥Êâã
+            if (cosangle < 0)
+            {
+                cv::putText(output, "RH", center, cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(0, 255, 255));
+                cv::putText(output, "IF", fingersIJSort[0], cv::FONT_HERSHEY_COMPLEX, 0.5, cv::Scalar(0, 255, 255));
+            }
+        }
 
 
 
-	}
+    }
 
 
 
