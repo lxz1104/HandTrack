@@ -1,2 +1,5 @@
 # 忽略以下目录
 cmake-build-debug/
+
+# 忽略以下文件
+*.xml
