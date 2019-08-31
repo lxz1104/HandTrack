@@ -1121,7 +1121,7 @@ namespace ht {
         template double norm<double, 3>(const cv::Vec<double, 3> & pt, int cv_norm_type);
 
 		// 通过中心点获取两个三维矢量之间的角度
-        double angleBetween3DVec(Vec3f a, Vec3f b, Vec3f center) {
+        double angleBetween3DVec(Vec3f a, Vec3f b, const Vec3f &center) {
             a -= center; b -= center;
             cv::Mat A(a), B(b);
             double dot = A.dot(B), mA = magnitude(a), mB = magnitude(b);
@@ -1132,11 +1132,11 @@ namespace ht {
             else return res;
         }
 
-        bool pointInImage(const cv::Mat & img, const Point2i pt) {
+        bool pointInImage(const cv::Mat &img, const Point2i &pt) {
             return pt.x >= 0 && pt.x < img.cols && pt.y >= 0 && pt.y < img.rows;
         }
 
-        bool pointInRect(const cv::Rect & rect, const Point2i pt)
+        bool pointInRect(const cv::Rect &rect, const Point2i &pt)
         {
             return pt.x >= rect.x && pt.x < rect.x + rect.width &&
                    pt.y >= rect.y && pt.y < rect.y + rect.height;
@@ -1147,11 +1147,11 @@ namespace ht {
                 pt.y <= margin_tb || pt.y >= (size.height - margin_tb);
         }
 
-        bool pointOnEdge(const cv::Rect rect, const Point2i pt, int margin_tb, int margin_lr) {
+        bool pointOnEdge(cv::Rect rect, Point2i pt, int margin_tb, int margin_lr) {
             return pointOnEdge(rect.size(), pt - rect.tl(), margin_tb, margin_lr);
         }
 
-        bool pointOnEdge(const cv::Mat & img, const Point2i pt, int margin_tb, int margin_lr) {
+        bool pointOnEdge(cv::Mat img, Point2i pt, int margin_tb, int margin_lr) {
             return pointOnEdge(img.size(), pt, margin_tb, margin_lr);
         }
 
@@ -1225,7 +1225,7 @@ namespace ht {
             }
         }
 
-        Point2i nearestPointOnCluster(const cv::Mat m, Point2i pt, int max_tries) {
+        Point2i nearestPointOnCluster(const cv::Mat &m, Point2i pt, int max_tries) {
             int tries = 0, run = 1, len = 2, direction = 0;
 
             pt.x = std::min(std::max(0, pt.x), m.cols - 1);
@@ -1289,12 +1289,12 @@ namespace ht {
 
 			// 2. 遍历图中的顶点并找到最大圆的中心（必须是其中一个顶点）
             const std::vector<boost::polygon::voronoi_vertex<double>> & xverts = vd.vertices();
-            for (unsigned i = 0; i < xverts.size(); ++i) {
+            for (const auto &xvert : xverts) {
 				// 不符合要求的顶点
-                if (xverts[i].is_degenerate() || xverts[i].incident_edge()->is_infinite())
+                if (xvert.is_degenerate() || xvert.incident_edge()->is_infinite())
                     continue;
 
-                Point2i vert(xverts[i].x(), xverts[i].y());
+                Point2i vert(xvert.x(), xvert.y());
                 if (!pointInRect(bounds, vert)) continue;
 
 				// 检查到顶部的距离
@@ -1302,10 +1302,10 @@ namespace ht {
                 float dist = util::euclideanDistance(vec, top_point);
                 if (dist > top_dist_thresh) continue;
 
-                Point2i pt0 (xverts[i].incident_edge()->vertex0()->x(),
-                    xverts[i].incident_edge()->vertex0()->y());
-                Point2i pt1 (xverts[i].incident_edge()->vertex1()->x(),
-                    xverts[i].incident_edge()->vertex1()->y());
+                Point2i pt0(xvert.incident_edge()->vertex0()->x(),
+                            xvert.incident_edge()->vertex0()->y());
+                Point2i pt1(xvert.incident_edge()->vertex1()->x(),
+                            xvert.incident_edge()->vertex1()->y());
 
 				// 检查边界内的入射线
                 if (!pointInRect(bounds, pt0) || !pointInRect(bounds, pt1)) continue;
