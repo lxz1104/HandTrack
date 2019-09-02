@@ -14,6 +14,9 @@
 #include <vector>
 #include <opencv2/core.hpp>
 
+// PCL
+#include <pcl/features/normal_3d.h>
+#include <pcl/visualization/pcl_visualizer.h>
 
 
 namespace ht {
@@ -65,14 +68,44 @@ namespace ht {
 		* @return void 绘制回归平面的矩阵的Cv_8uc3表示
 		*/
         static void visualizePlaneRegression(const cv::Mat & input_mat, cv::Mat & output, 
-                    std::vector<double> &equation, const double threshold, bool clicked = false);
+                    std::vector<double> &equation, double threshold, bool clicked = false);
 
 		/**
 		 * 可视化平面上的点。
 		 * @param [in] input_mat 输入点云
 		 * @param [in] indicies  表示平面上各点的坐标（i，j）
 		 */
-        static void visualizePlanePoints(cv::Mat &input_mat, std::vector<Point2i> indicies);
+		static void visualizePlanePoints(cv::Mat &input_mat, const std::vector<Point2i>& indicies);
+
+
+        /**
+        * Visualization for PCL point cloud.
+        * @param [in] cloud PCL point cloud to be visualized
+        */
+        template<class Point_T>
+        static void visualizeCloud(boost::shared_ptr<pcl::PointCloud<Point_T>> cloud,
+        const std::string & name = "ark_cloud", int viewport = 0)
+        {
+            initPCLViewer();
+            viewer->setBackgroundColor(0, 0, 0);
+            if (!viewer->updatePointCloud<Point_T>(cloud, name))
+                viewer->addPointCloud<Point_T>(cloud, name, viewport);
+            viewer->spinOnce();
+        }
+        /**
+        * Visualization for polygon mesh.
+        * Visualize a PCL point cloud as a polygon mesh
+        * @param [in] cloud PCL point cloud to be visualized
+        */
+        static void visulizePolygonMesh(const pcl::PointCloud<pcl::PointXYZ>::Ptr& cloud);
+
+        /** Create a viewport within the given bounds (each coordinate should be within the range [0,1]).
+         * @return the ID of the viewport created
+         */
+        static int createPCLViewport(double xmin, double ymin, double xmax, double ymax);
+
+        /** Get the internal PCL visualizer */
+        static pcl::visualization::PCLVisualizer::Ptr getPCLVisualizer();
 
     private:
 		/**
@@ -83,6 +116,17 @@ namespace ht {
 		 */
         static void visualizeMatrix(const cv::Mat & input, cv::Mat & output);
 
+
+        /**
+         * Initializes & opens the PCL visualizer
+         * @return true on success, false if visualizer already open
+         */
+        static bool initPCLViewer();
+
+        /**
+        * PCL point cloud viewer
+        */
+        static pcl::visualization::PCLVisualizer::Ptr viewer;
     };
 }
 
