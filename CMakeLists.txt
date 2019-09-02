@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 2.6)
-project(hand-label)
+project(HandTrack)
 
 set(CMAKE_CXX_STANDARD 11)
 
-set(CMAKE_BUILD_TYPE Release)
+#set(CMAKE_BUILD_TYPE Release)
 
 #设置头文件所在目录
 set(INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include")
@@ -72,7 +72,7 @@ ADD_DEFINITIONS(-DBOOST_LOG_DYN_LINK)
 
 aux_source_directory(./lib SRC)
 
-add_executable(hand-label ${SRC} main.cpp)
+add_executable(HandTrack ${SRC} main.cpp)
 
-COPY_ROYALE_LIBS(hand-label)
-target_link_libraries(hand-label ${DEPENDENCIES})
+COPY_ROYALE_LIBS(HandTrack)
+target_link_libraries(HandTrack ${DEPENDENCIES})
