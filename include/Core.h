@@ -21,6 +21,5 @@
 #include "Detector.h"
 #include "HandDetector.h"
 #include "Visualizer.h"
-#include "Label.h"
 
 #endif // !CORE_H

@@ -12,6 +12,7 @@
 #include "FrameObject.h"
 #include <opencv2/video/tracking.hpp>
 #include <boost/circular_buffer.hpp>
+#include <map>
 
 namespace ht {
 	/**
@@ -228,6 +229,45 @@ namespace ht {
 		 */
 		Point2i getwristmidIJ() const;
 
+        /**
+         * 获取左手标签的像素坐标
+         */
+        std::map<std::string, Point2i> getLHlabelij() const;
+
+        /**
+         * 获取左手标签的世界坐标
+         */
+        std::map<std::string, Vec3f> getLHlabelXYZ() const;
+
+        /**
+         * 获取右手标签的像素坐标
+         */
+        std::map<std::string, Point2i> getRHlabelij() const;
+
+        /**
+         * 获取右手标签的世界坐标
+         */
+        std::map<std::string, Vec3f> getRHlabelXYZ() const;
+
+        /**
+         * 获取左手掌心的像素坐标
+         */
+        std::map<std::string, Point2i> getLHcenterij() const;
+
+        /**
+         * 获取左手掌心的世界坐标
+         */
+        std::map<std::string, Vec3f> getLHcenterXYZ() const;
+
+        /**
+         * 获取右手掌心的像素坐标
+         */
+        std::map<std::string, Point2i> getRHcenterij() const;
+
+        /**
+         * 获取右手掌心的世界坐标
+         */
+        std::map<std::string, Vec3f> getRHcenterXYZ() const;
     private:
 		/**
 		 * 确定对象是否连接到边缘。
@@ -273,6 +313,46 @@ namespace ht {
 		 * 手腕两侧 ([0] 代表左边, [1]代表右边)的(i,j)坐标位置
 		 */
         std::vector<Point2i> wristIJ;
+
+        /**
+         * 左手标签,手指加像素坐标
+         */
+        std::map<std::string, Point2i> LHlabelij;
+
+        /**
+         * 左手标签,手指加世界坐标
+         */
+        std::map<std::string, Vec3f> LHlabelXYZ;
+
+        /**
+         * 右手标签，手指加像素坐标
+         */
+        std::map<std::string, Point2i> RHlabelij;
+
+        /**
+         * 右手标签,手指加世界坐标
+         */
+        std::map<std::string, Vec3f> RHlabelXYZ;
+
+        /**
+         * 左手掌心加像素坐标
+         */
+        std::map<std::string, Point2i> LHcenterij;
+
+        /**
+         * 左手标心加世界坐标
+         */
+        std::map<std::string, Vec3f> LHcenterXYZ;
+
+        /**
+         * 右手心加像素坐标
+         */
+        std::map<std::string, Point2i> RHcenterij;
+
+        /**
+         * 右手心加世界坐标
+         */
+        std::map<std::string, Vec3f> RHcenterXYZ;
 
 		/**
 		 * 最大内接圆半径

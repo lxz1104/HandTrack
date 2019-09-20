@@ -1,6 +1,5 @@
 ﻿#include "Core.h"
 #include "PMDCamera.h"
-#include "Label.h"
 
 using namespace ht;
 
@@ -11,7 +10,8 @@ void testHandTrack();
 void test3DView();
 
 int main() {
-    test3DView();
+//    test3DView();
+    testHandTrack();
 	return 0;
 }
 
@@ -106,7 +106,7 @@ void testHandTrack() {
                 if (!handVisual.empty()) {
                     // 可视化检测到的手
                     Visualizer::visualizeHand(handVisual, handVisual, hand.get());
-                    Label::labelFingers(handVisual, handVisual, hand.get());
+                    //Label::labelFingers(handVisual, handVisual, hand.get());
                 }
                 ++i;
                 if (i >= 2) {

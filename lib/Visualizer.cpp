@@ -103,11 +103,47 @@ namespace ht {
         const std::vector<Point2i> & defects = hand->getDefectsIJ();	// 缺陷点像素坐标
         const std::vector<Vec3f> & fingersXYZ = hand->getFingers();		// 被检测到的手指的指尖的世界坐标
         const std::vector<Vec3f> & defectsXYZ = hand->getDefects();		// 缺陷点像素世界坐标
+        const std::map<std::string, Point2i> &LHlabelij = hand->getLHlabelij();    //获取左手标签
+        const std::map<std::string, Point2i> &RHlabelij = hand->getRHlabelij();    //获取右手标签
+        const std::map<std::string, Point2i> &LHcenterij = hand->getLHcenterij();  //获取左手手心
+        const std::map<std::string, Point2i> &RHcenterij = hand->getRHcenterij();  //获取右手手心
+
+        //打标签
+        if (!LHlabelij.empty()) {
+            for (std::_Rb_tree_const_iterator<std::pair<const std::basic_string<char>, cv::Point_<int>>> iter = LHlabelij.begin();
+                 iter != LHlabelij.end(); iter++) {
+                cv::putText(output, iter->first, iter->second, cv::FONT_HERSHEY_COMPLEX, 0.5,
+                            cv::Scalar(0, 255, 255));
+            }
+        }
+        if (!RHlabelij.empty()) {
+            for (std::_Rb_tree_const_iterator<std::pair<const std::basic_string<char>, cv::Point_<int>>> iter = RHlabelij.begin();
+                 iter != RHlabelij.end(); iter++) {
+                cv::putText(output, iter->first, iter->second, cv::FONT_HERSHEY_COMPLEX, 0.5,
+                            cv::Scalar(0, 255, 255));
+            }
+        }
+        if (!LHcenterij.empty()) {
+            for (std::_Rb_tree_const_iterator<std::pair<const std::basic_string<char>, cv::Point_<int>>> iter = LHcenterij.begin();
+                 iter != LHcenterij.end(); iter++) {
+                cv::putText(output, iter->first, iter->second, cv::FONT_HERSHEY_COMPLEX, 0.5,
+                            cv::Scalar(0, 255, 255));
+            }
+        }
+        if (!RHcenterij.empty()) {
+            for (std::_Rb_tree_const_iterator<std::pair<const std::basic_string<char>, cv::Point_<int>>> iter = RHcenterij.begin();
+                 iter != RHcenterij.end(); iter++) {
+                cv::putText(output, iter->first, iter->second, cv::FONT_HERSHEY_COMPLEX, 0.5,
+                            cv::Scalar(0, 255, 255));
+            }
+        }
+
 
 		// 绘制每根手指（绘制的是被检测到的手指，并不是绘制所有的手指）
         for (int i = 0; i < hand->getNumFingers(); ++i)
         {
-			// 画手指
+
+            // 画手指
             cv::line(output, defects[i], fingers[i], cv::Scalar(0, 150, 255), roundf(unitWid * 2));
             cv::circle(output, fingers[i], static_cast<int>(roundf(unitWid * 7)), cv::Scalar(0, 0, 255), -1);
 
@@ -155,7 +191,6 @@ namespace ht {
         {
             Visualizer::visualizeXYZMap(input_mat, output);
         }
-
         else
         {
             output = input_mat;
