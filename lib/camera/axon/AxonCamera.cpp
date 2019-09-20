@@ -38,7 +38,7 @@ namespace ht {
 								<< driver.minor << "." << driver.maintenance << "." << driver.build;
 
 		/** 创建深度流 */
-		if (this->device.getSensorInfo(openni::SENSOR_DEPTH) != nullptr) {\
+		if (this->device.getSensorInfo(openni::SENSOR_DEPTH) != nullptr) {
 			// 有深度Sensor则创建深度流
 			rc = this->depth.create(device, openni::SENSOR_DEPTH);
 			if (rc == openni::STATUS_OK)
@@ -59,10 +59,10 @@ namespace ht {
 			}
 		}
 		
-
-		if (!depth.isValid())// || !color.isValid())
+		/** 检查深度流是否合法 */
+		if (!depth.isValid())
 		{
-			printf("SimpleViewer: No valid streams. Exiting\n");
+			BOOST_LOG_TRIVIAL(error) << "No valid streams. Exiting\n";
 			openni::OpenNI::shutdown();
 			exit(EXIT_FAILURE);
 		}
@@ -75,6 +75,8 @@ namespace ht {
 		BOOST_LOG_TRIVIAL(info) << "Begin init " << this->getModelName() << " Camera...";
 		//初始化相机
 		this->initCamera();
+		// 初始化图像矩阵
+		this->xyzMap.create(cv::Size(AXonCamera::Depth_Width, AXonCamera::Depth_Width), CV_32FC3);
 	}
 
 	AXonCamera::~AXonCamera()
@@ -98,11 +100,11 @@ namespace ht {
 	}
 
 	int AXonCamera::getWidth() const {
-		return AXonCamera::depth_width;
+		return AXonCamera::Depth_Width;
 	}
 
 	int AXonCamera::getHeight() const {
-		return AXonCamera::depth_height;
+		return AXonCamera::Depth_Height;
 	}
 
 	float AXonCamera::flagMapConfidenceThreshold() const {
@@ -128,5 +130,65 @@ namespace ht {
 			cv::Mat& amp_map, cv::Mat& flag_map)
 	{
 		// 一定要执行拷贝操作，不能直接使用等号运算符赋值
+		
+		// 记录帧数据
+		openni::VideoFrameRef frame;
+		// 状态变量
+		openni::Status rc = openni::STATUS_OK;
+
+		int changedStreamDummy;
+		openni::VideoStream* pStream = &depth;
+		rc = openni::OpenNI::waitForAnyStream(&pStream, 1, &changedStreamDummy,
+			2000);    /*等待流*/
+		if (rc != openni::STATUS_OK)
+		{
+			BOOST_LOG_TRIVIAL(error) << "Wait failed! (timeout is 2000 ms): "
+									 << openni::OpenNI::getExtendedError();
+			return;
+		}
+
+		/*读深度流帧数据*/
+		rc = depth.readFrame(&frame); 
+		if (rc != openni::STATUS_OK)
+		{
+			BOOST_LOG_TRIVIAL(error) << "Read failed: " <<  openni::OpenNI::getExtendedError();
+			return;
+		}
+
+		if (frame.getVideoMode().getPixelFormat() != openni::PIXEL_FORMAT_DEPTH_1_MM &&
+			frame.getVideoMode().getPixelFormat() != openni::PIXEL_FORMAT_DEPTH_100_UM &&
+			frame.getVideoMode().getPixelFormat() != openni::PIXEL_FORMAT_DEPTH_1_3_MM)
+		{
+			BOOST_LOG_TRIVIAL(error) << "Unexpected frame format!!";
+			return;
+		}
+
+		openni::DepthPixel* pDepthRow = (openni::DepthPixel*)frame.getData(); /*当前帧的深度数据*/
+
+		// 将图像矩阵置零
+		this->xyzMap = cv::Scalar::all(0);
+		cv::Vec3f* xyzptr = nullptr;
+
+		for (int y = 0; y < frame.getHeight(); ++y)
+		{
+			xyzptr = this->xyzMap.ptr<cv::Vec3f>(y);
+
+			const openni::DepthPixel* pDepth = pDepthRow;
+
+			for (int x = 0; x < frame.getWidth(); ++x, ++pDepth)
+			{
+				xyzptr[x][0] = x;
+				xyzptr[x][1] = y;
+				xyzptr[x][2] = *pDepth;
+			}
+		}
+
+
+		this->xyzMap.copyTo(xyz_map);
+		//int middleIndex = (frame.getHeight() + 1) * frame.getWidth() / 2;
+		///*打印当前帧的时间戳和中心深渡值*/
+		//printf("[%08llu]%8d\n", (long long)frame.getTimestamp(), pDepth[middleIndex]);
+
+
 	}
 }

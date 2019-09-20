@@ -66,9 +66,6 @@
     <ClCompile Include="lib\FramePlane.cpp">
       <Filter>源文件\lib</Filter>
     </ClCompile>
-    <ClCompile Include="lib\Label.cpp">
-      <Filter>源文件\lib</Filter>
-    </ClCompile>
     <ClCompile Include="lib\camera\pmd\PMDCamera.cpp">
       <Filter>源文件\lib\camera\pmd</Filter>
     </ClCompile>
@@ -120,9 +117,6 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="include\FramePlane.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Label.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="include\camera\pmd\PMDCamera.h">

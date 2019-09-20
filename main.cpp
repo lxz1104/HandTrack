@@ -1,8 +1,6 @@
 ﻿#include "Core.h"
 #include "camera/pmd/PMDCamera.h"
 #include "camera/axon/AxonCamera.h"
-#include <boost/circular_buffer.hpp>
-#include "Label.h"
 
 using namespace ht;
 
@@ -34,7 +32,7 @@ int main() {
 
 	int currFrame = 0;		// 当前位于第几帧
 
-	char chr[64] = { '/0' };
+	char chr[64] = { '0' };
 
 	// 主进程
 	while (true)
@@ -81,7 +79,6 @@ int main() {
 				if (!handVisual.empty()) {
 					// 可视化检测到的手
 					Visualizer::visualizeHand(handVisual, handVisual, hand.get());
-					Label::labelFingers(handVisual, handVisual, hand.get());
 				}
 				++i;
 				if (i >= 2) {

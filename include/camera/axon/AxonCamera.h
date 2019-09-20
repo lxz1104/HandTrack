@@ -108,6 +108,10 @@ namespace ht {
 		/** 指向PMD相机实例 */
 		typedef std::shared_ptr<AXonCamera> Ptr;
 
+		//深度图像参数
+		static const int Depth_Width = 640; // 深度图像宽度
+		static const int Depth_Height = 480; // 深度图像高度
+
 	protected:
 		/**
 		 * 从相机中获得下一帧图像信息
@@ -141,10 +145,8 @@ namespace ht {
 		openni::VideoStream depth;
 		openni::VideoFrameRef frame;
 
-		//深度图像参数
-		static const int depth_width = 640; // 深度图像宽度
-		static const int depth_height = 480; // 深度图像高度
-
+		// 图像矩阵
+		cv::Mat xyzMap;
 	};
 
 }

@@ -113,6 +113,7 @@
       <EnableParallelCodeGeneration>false</EnableParallelCodeGeneration>
       <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <UndefinePreprocessorDefinitions>%(UndefinePreprocessorDefinitions)</UndefinePreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -153,6 +154,7 @@
       <EnableParallelCodeGeneration>false</EnableParallelCodeGeneration>
       <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <UndefinePreprocessorDefinitions>%(UndefinePreprocessorDefinitions)</UndefinePreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -173,7 +175,6 @@
     <ClCompile Include="lib\Hand.cpp" />
     <ClCompile Include="lib\HandClassifier.cpp" />
     <ClCompile Include="lib\HandDetector.cpp" />
-    <ClCompile Include="lib\Label.cpp" />
     <ClCompile Include="lib\Util.cpp" />
     <ClCompile Include="lib\Visualizer.cpp" />
     <ClCompile Include="main.cpp" />
@@ -192,7 +193,6 @@
     <ClInclude Include="include\Hand.h" />
     <ClInclude Include="include\HandClassifier.h" />
     <ClInclude Include="include\HandDetector.h" />
-    <ClInclude Include="include\Label.h" />
     <ClInclude Include="include\stdafx.h" />
     <ClInclude Include="include\ThreadPool.hpp" />
     <ClInclude Include="include\Type.hpp" />

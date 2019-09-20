@@ -139,8 +139,8 @@ namespace ht {
 		CamListener listener; // 数据流监听对象
 
         //深度图像参数
-        static const int depth_width = 224; // 深度图像宽度
-        static const int depth_height = 171; // 深度图像高度
+        static const int Depth_Width = 224; // 深度图像宽度
+        static const int Depth_Height = 171; // 深度图像高度
         
     };
 

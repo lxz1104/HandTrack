@@ -138,11 +138,11 @@ namespace ht {
 	}
 
 	int PMDCamera::getWidth() const {
-		return 224;
+		return PMDCamera::Depth_Width;
 	}
 
 	int PMDCamera::getHeight() const {
-		return 171;
+		return PMDCamera::Depth_Width;
 	}
 
 	float PMDCamera::flagMapConfidenceThreshold() const {
