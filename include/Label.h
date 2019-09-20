@@ -1,4 +1,4 @@
-﻿/***************************************************************************
+/***************************************************************************
  *@File:label.h
  *@Author:YQ
  *@Date:2019-08-24
@@ -16,57 +16,49 @@
 
 namespace ht {
 
-	// 手指标签枚举
-	enum FingerLabel {
-		L_THUMB,		//拇指（左）
-		L_FOREFINGER,	//食指（左）
-		L_MIDFINGER,	//中指（左）
-		L_RINGFINGER,	//无名指（左）
-		L_LITTERFINGER,	//小指（左）
+    // 手指标签枚举
+    enum FingerLabel {
+        L_THUMB,		//拇指（左）
+        L_FOREFINGER,	//食指（左）
+        L_MIDFINGER,	//中指（左）
+        L_RINGFINGER,	//无名指（左）
+        L_LITTERFINGER,	//小指（左）
 
-		R_THUMB,		//拇指（右）
-		R_FOREFINGER,	//食指（右）
-		R_MIDFINGER,	//中指（右）
-		R_RINGFINGER,	//无名指（右）
-		R_LITTERFINGER	//小指（右）
-	};
+        R_THUMB,		//拇指（右）
+        R_FOREFINGER,	//食指（右）
+        R_MIDFINGER,	//中指（右）
+        R_RINGFINGER,	//无名指（右）
+        R_LITTERFINGER	//小指（右）
+    };
 
-	// 手部标签枚举
-	enum HandLabel {
-		L_HAND,		//左手
-		R_HAND		//右手
-	};
+    // 手部标签枚举
+    enum HandLabel {
+        L_HAND,		//左手
+        R_HAND		//右手
+    };
 
-	// 掌心标签枚举
-	enum CenterLabel
-	{
-		L_CENTER,	//左手手心
-		R_CENTER	//右手手心
-	};
-
-
-	/**
-	 * 针对缺陷点的个数，对特定手势进行标签化
-	 */
-	class Label
-	{
-	public:
-
-		/**
-		 * 对手指指尖打标签
-		 */
-		static void labelFingers(const cv::Mat& background, cv::Mat& output, Hand* hand);
-
-	private:
-		/** 指尖标签对象 */
-
-		/** 指向Label实例 */
-		typedef std::shared_ptr<Label> Ptr;
-
-		/** 此部分有待完善 */
+    // 掌心标签枚举
+    enum CenterLabel
+    {
+        L_CENTER,	//左手手心
+        R_CENTER	//右手手心
+    };
 
 
-	};
+    /**
+     * 针对缺陷点的个数，对特定手势进行标签化
+     */
+    class Label
+    {
+    public:
+
+        /**
+         * 对手指指尖打标签
+         */
+        static void labelFingers(const cv::Mat& background, cv::Mat& output, Hand* hand);
+
+
+    };
 }
 
 #endif //HAND_LABEL_LABEL_H
