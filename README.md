@@ -25,7 +25,7 @@
   所需的第三方依赖库的源码我们已经打包好方法在`third_party`文件夹中，其他的依赖库可以通过`apt`安装，下面是安装步骤，请保持网络畅通。
 
   1. 安装工具库
-  `` shell
+  ``` shell
   sudo apt update
   
   sudo apt -y install g++ build-essential cmake cmake-gui git-core
@@ -37,23 +37,23 @@
   sudo apt -y install freeglut3-dev pkg-config libxmu-dev libxi-dev libphonon-dev libphonon-dev phonon-backend-gstreamer
   
   sudo apt -y install phonon-backend-vlc graphviz mono-complete libflann-dev
-  ``
+  ```
   
   2. 安装编译工具
   确保g++版本大于5.0
-  `` shell
+  ``` shell
   sudo apt update
   
   sudo apt install gcc g++ make -y
-  ``
+  ```
   
   3. 安装PCL库（点云库）
-  `` shell
+  ``` shell
   sudo apt install libpcl-*
-  ``
+  ```
   
   4. 安装OpenCV编译依赖
-  `` shell
+  ``` shell
   sudo add-apt-repository "deb http://security.ubuntu.com/ubuntu xenial-security main"
   
   sudo apt update
@@ -77,10 +77,10 @@
   sudo apt -y install libgtk2.0-dev
   
   sudo apt -y install libglfw3 libglfw3-dev
-  ``
+  ```
   
   7. 编译安装OpenCV
-  `` shell
+  ``` shell
   cd third_party/opencv-4.1.0
   
   mkdir build && cd build
@@ -88,10 +88,10 @@
   cmake -D CMAKE_BUILD_TYPE=RELEASE -DWITH_TBB=ON -DOPENCV_EXTRA_MODULES_PATH="../opencv_contrib-4.1.0/modules" -DBUILD_PERF_TESTS=OFF -DBUILD_TESTS=OFF ..
   
   make -j6 && sudo make install
-  ``
+  ```
   
   10. 编译手势追踪源码
-  `` shell
+  ``` shell
   mkdir build && cd build
   cmake  ..
 # 默认情况下没有开编译器优化

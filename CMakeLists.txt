@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.6)
-project(hand-label)
+project(HandTrack)
 
 set(CMAKE_CXX_STANDARD 11)
 
@@ -83,8 +83,7 @@ add_definitions(
 
 aux_source_directory(./lib SRC)
 
+add_executable(HandTrack ${SRC} main.cpp)
 
-add_executable(hand-label ${SRC} main.cpp)
-
-COPY_ROYALE_LIBS(hand-label)
-target_link_libraries(hand-label ${DEPENDENCIES})
+COPY_ROYALE_LIBS(HandTrack)
+target_link_libraries(HandTrack ${DEPENDENCIES})
