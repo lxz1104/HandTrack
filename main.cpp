@@ -1,5 +1,6 @@
 ﻿#include "Core.h"
-#include "PMDCamera.h"
+#include "camera/pmd/PMDCamera.h"
+#include "camera/axon/AxonCamera.h"
 #include <boost/circular_buffer.hpp>
 #include "Label.h"
 
@@ -7,7 +8,8 @@ using namespace ht;
 
 int main() {
 	// 初始化相机实例
-	DepthCamera::Ptr camera = std::make_shared<ht::PMDCamera>();
+	//DepthCamera::Ptr camera = std::make_shared<ht::PMDCamera>();	// PMD camera
+	DepthCamera::Ptr camera = std::make_shared<ht::AXonCamera>();	// AXon camera
 
 	// 初始化检测参数
 	DetectionParams::Ptr params = camera->getDefaultParams(); //使用默认参数

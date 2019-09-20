@@ -1,8 +1,9 @@
 ﻿//
 // Created by lxz on 19-6-23.
 //
+#include "camera/pmd/PMDCamera.h"
 #include "stdafx.h"
-#include "PMDCamera.h"
+
 
 using namespace std;
 

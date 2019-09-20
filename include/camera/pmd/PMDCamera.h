@@ -10,18 +10,16 @@
 #ifndef PMDCAMERA_PMDCAMERA_H
 #define PMDCAMERA_PMDCAMERA_H
 
-//STL Libraries
+// STL Libraries
 #include <memory>
 
 // PMD Libraries
 #include <royale.hpp>
 
-//OpenCV Libraries
-#include <opencv2/core.hpp> 
-
-//camera listener
+// camera listener
 #include "PMDCamreaListener.h"
-// 基类
+
+// base class
 #include "DepthCamera.h"
 
 

@@ -16,6 +16,24 @@
     <Filter Include="源文件\lib">
       <UniqueIdentifier>{b7037d70-6ea4-415f-9db1-a4f51fad41e4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="头文件\camera">
+      <UniqueIdentifier>{b36480a2-23ef-483f-8898-5cb7be027b61}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\camera\pmd">
+      <UniqueIdentifier>{66f50076-5037-47cc-98c5-a5ee3ae6d07d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\camera\axon">
+      <UniqueIdentifier>{5d6e7d12-019b-4519-9c83-c2d462a9651e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\lib\camera">
+      <UniqueIdentifier>{aa0ab5b5-1cac-4bee-b323-281d8ef7932a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\lib\camera\axon">
+      <UniqueIdentifier>{d89271ab-c778-45f6-ac5d-619fdbaafdd2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\lib\camera\pmd">
+      <UniqueIdentifier>{e6cafcb4-4066-46d7-b641-9b40c7dd8386}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="lib\DepthCamera.cpp">
@@ -36,12 +54,6 @@
     <ClCompile Include="lib\HandDetector.cpp">
       <Filter>源文件\lib</Filter>
     </ClCompile>
-    <ClCompile Include="lib\PMDCamera.cpp">
-      <Filter>源文件\lib</Filter>
-    </ClCompile>
-    <ClCompile Include="lib\PMDCamreaListener.cpp">
-      <Filter>源文件\lib</Filter>
-    </ClCompile>
     <ClCompile Include="lib\Util.cpp">
       <Filter>源文件\lib</Filter>
     </ClCompile>
@@ -56,6 +68,15 @@
     </ClCompile>
     <ClCompile Include="lib\Label.cpp">
       <Filter>源文件\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\camera\pmd\PMDCamera.cpp">
+      <Filter>源文件\lib\camera\pmd</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\camera\pmd\PMDCamreaListener.cpp">
+      <Filter>源文件\lib\camera\pmd</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\camera\axon\AxonCamera.cpp">
+      <Filter>源文件\lib\camera\axon</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -86,12 +107,6 @@
     <ClInclude Include="include\HandDetector.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="include\PMDCamera.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="include\PMDCamreaListener.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="include\stdafx.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -108,6 +123,18 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="include\Label.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\camera\pmd\PMDCamera.h">
+      <Filter>头文件\camera\pmd</Filter>
+    </ClInclude>
+    <ClInclude Include="include\camera\pmd\PMDCamreaListener.h">
+      <Filter>头文件\camera\pmd</Filter>
+    </ClInclude>
+    <ClInclude Include="include\camera\axon\AxonCamera.h">
+      <Filter>头文件\camera\axon</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Type.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

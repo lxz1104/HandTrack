@@ -9,7 +9,7 @@
 #ifndef DETECTION_PARAMS_H
 #define DETECTION_PARAMS_H
 
-#include "stdafx.h"
+#include "Type.hpp"
 
 namespace ht {
 	/**

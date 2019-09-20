@@ -34,6 +34,7 @@
 #define UTIL_H
 
 #include "stdafx.h"
+#include "Type.hpp"
 
 #include <opencv2/opencv.hpp>
 #include <boost/smart_ptr.hpp>
