@@ -167,7 +167,7 @@ namespace ht {
     void PMDCamera::update(cv::Mat & xyz_map, cv::Mat & rgb_map, cv::Mat & ir_map,
                            cv::Mat & amp_map, cv::Mat & flag_map)
     {
-		// 一定要执行拷贝操作，不能直接使用等号运算符赋值
+		// !!一定要执行拷贝操作，不能直接使用等号运算符赋值
 		this->listener.getXYZMap(xyz_map);
 		this->listener.getAmpMap(amp_map);
     }

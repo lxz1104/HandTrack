@@ -106,11 +106,11 @@ int main() {
 		
 		// 可视化手、平面、XYZMap
 		if (!xyzMap.empty()) {
-			scaledZImage.create(cv::Size(224 * 4, 171 * 4), CV_8UC1);
+			scaledZImage.create(cv::Size(camera->getWidth(), camera->getHeight()), CV_8UC1);
 			resize(xyzMap, scaledZImage, scaledZImage.size());
 			cv::imshow(camera->getModelName() + " Depth Map", scaledZImage);
 			if (!handVisual.empty()) {
-				scaledZImage.create(cv::Size(224 * 3, 171 * 3), CV_8UC1);
+				scaledZImage.create(cv::Size(camera->getWidth(), camera->getHeight()), CV_8UC1);
 				resize(handVisual, scaledZImage, scaledZImage.size());
 				cv::imshow("Demo Output", scaledZImage);
 			}

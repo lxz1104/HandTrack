@@ -12,6 +12,8 @@
 
 // STL Libraries
 #include <memory>
+#include <thread>
+#include <atomic>
 
 // OpenNI Libraries
 #include <OpenNI.h>
@@ -19,7 +21,7 @@
 // AXon camera Libraries
 #include <AXonLink.h>
 
-// base class
+// Base class
 #include "DepthCamera.h"
 
 
@@ -133,11 +135,17 @@ namespace ht {
 		void update(cv::Mat& xyz_map, cv::Mat& rgb_map, cv::Mat& ir_map,
 			cv::Mat& amp_map, cv::Mat& flag_map) override;
 	private:
-
 		/**
 		 * 初始化相机
 		 */
 		void initCamera();
+		/**
+		 * 更新深度信息辅助函数
+		 */
+		void updateHelper();
+
+		CamIntrinsicParam* GetDepthInstrinsicParamByResolution(int  nWidth, int nHeight, AXonLinkCamParam* allParam);
+	private:
 
 		/** 设备管理器对象 */
 		openni::Device device;
@@ -145,8 +153,22 @@ namespace ht {
 		openni::VideoStream depth;
 		openni::VideoFrameRef frame;
 
-		// 图像矩阵
+		CamIntrinsicParam* depthIntParam;
+
+		/** 图像捕获线程 */
+		std::shared_ptr<std::thread> capThread;
+
+		/** 信号量，用于控制图像捕获线程 */
+		std::atomic_bool isCapture;
+
+		/** 图像互斥锁 */
+		std::mutex imageMutex;
+
+		/** 包含三维点云信息的图像矩阵 */
 		cv::Mat xyzMap;
+
+		/** 图像矩阵缓冲 */
+		cv::Mat xyzBuffer;
 	};
 
 }
