@@ -1,6 +1,7 @@
 ﻿#include "camera/pmd/PMDCamreaListener.h"
 
 namespace ht {
+
 	void CamListener::onNewData(const royale::DepthData* data) {
 		std::lock_guard<std::mutex> lock(this->imgMutex);
 

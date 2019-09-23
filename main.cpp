@@ -6,8 +6,8 @@ using namespace ht;
 
 int main() {
 	// 初始化相机实例
-	//DepthCamera::Ptr camera = std::make_shared<ht::PMDCamera>();	// PMD camera
-	DepthCamera::Ptr camera = std::make_shared<ht::AXonCamera>();	// AXon camera
+	//DepthCamera::Ptr camera = std::make_shared<ht::camera::PMDCamera>();	// PMD camera
+	DepthCamera::Ptr camera = std::make_shared<ht::camera::AXonCamera>();	// AXon camera
 
 	// 初始化检测参数
 	DetectionParams::Ptr params = camera->getDefaultParams(); //使用默认参数
@@ -106,11 +106,11 @@ int main() {
 		
 		// 可视化手、平面、XYZMap
 		if (!xyzMap.empty()) {
-			scaledZImage.create(cv::Size(camera->getWidth(), camera->getHeight()), CV_8UC1);
+			scaledZImage.create(cv::Size(camera->getWidth() * 2, camera->getHeight() * 2), CV_8UC1);
 			resize(xyzMap, scaledZImage, scaledZImage.size());
 			cv::imshow(camera->getModelName() + " Depth Map", scaledZImage);
 			if (!handVisual.empty()) {
-				scaledZImage.create(cv::Size(camera->getWidth(), camera->getHeight()), CV_8UC1);
+				scaledZImage.create(cv::Size(camera->getWidth() * 2, camera->getHeight() * 2), CV_8UC1);
 				resize(handVisual, scaledZImage, scaledZImage.size());
 				cv::imshow("Demo Output", scaledZImage);
 			}
