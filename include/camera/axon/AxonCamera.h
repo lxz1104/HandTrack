@@ -153,14 +153,6 @@ namespace ht {
 			openni::Device device;
 			/** 深度流对象 */
 			openni::VideoStream depth;
-			/** RGB流对象 */
-			//openni::VideoStream color;
-			/** IR流对象 */
-			//openni::VideoStream ir;
-			/** 深度数据帧对象 */
-			//openni::VideoFrameRef depthFrame;
-			/** 深度数据初始化参数 */
-			//CamIntrinsicParam* depthIntParam;
 
 			/** 图像捕获线程 */
 			std::shared_ptr<std::thread> capThread;

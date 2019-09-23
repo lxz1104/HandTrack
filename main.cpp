@@ -79,6 +79,13 @@ int main() {
 				if (!handVisual.empty()) {
 					// 可视化检测到的手
 					Visualizer::visualizeHand(handVisual, handVisual, hand.get());
+					std::map<std::string, Vec3f> LMap = hand->getLHlabelXYZ();
+					
+					// 输出三维坐标
+					/*for (auto item : LMap)
+					{
+						BOOST_LOG_TRIVIAL(info) << item.first << ": " << item.second;
+					}*/
 				}
 				++i;
 				if (i >= 2) {

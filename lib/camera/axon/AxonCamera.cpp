@@ -147,24 +147,9 @@ namespace ht {
 				return;
 			BOOST_LOG_TRIVIAL(info) << "设备连接状态: OK";
 
-
-
-			openni::VideoMode depthVideoMode = this->depth.getVideoMode();
-			depthVideoMode.setResolution(640, 480);
-			this->depth.setVideoMode(depthVideoMode);
-
-
-
-			AXonLinkCamParam camParam;
-			int dataSize = sizeof(AXonLinkCamParam);
-			openni::Status rc = openni::STATUS_OK;
-			rc = this->device.getProperty(AXONLINK_DEVICE_PROPERTY_GET_CAMERA_PARAMETERS,
-				&camParam, &dataSize);
-			CamIntrinsicParam* depthIntParam = GetDepthInstrinsicParamByResolution(640, 480, &camParam);// 深度帧参数
-
-
 			// 记录帧数据
-			openni::VideoFrameRef colorFrame, depthFrame, irFrame;
+			openni::Status rc = openni::STATUS_OK;
+			openni::VideoFrameRef depthFrame;
 
 			int temp;
 			BOOST_LOG_TRIVIAL(info) << "图像捕获线程启动.";
@@ -195,9 +180,6 @@ namespace ht {
 					BOOST_LOG_TRIVIAL(error) << "Unexpected frame format!!";
 					return;
 				}
-
-				openni::PixelFormat format = this->depth.getVideoMode().getPixelFormat();
-				float depth_unit = openni::OpenNI::getDepthValueUnit_mm(format);
 
 				/** 当前帧的深度数据 */
 				const openni::DepthPixel* depthImage = (const openni::DepthPixel*)depthFrame.getData();
