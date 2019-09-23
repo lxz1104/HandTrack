@@ -58,7 +58,7 @@ namespace ht {
 
 			/**
 			 * 开始使用指定路径中的数据训练此分类器。
-			 * @param  dataPath    培训数据目录的数据路径
+			 * @param  dataPath    训练数据目录的数据路径
 			 * @param  hyperparams 超参数数组
 			 * @return bool        成功时为真，错误时为假。如果已经训练过，则返回真。
 			 */
@@ -79,7 +79,7 @@ namespace ht {
 
         protected:
 			/**
-			 * 如果分类器经过培训，则为真。
+			 * 如果分类器经过训练，则为真。
 			 */
             bool trained = false;
 

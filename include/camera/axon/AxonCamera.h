@@ -145,15 +145,22 @@ namespace ht {
 		void updateHelper();
 
 		CamIntrinsicParam* GetDepthInstrinsicParamByResolution(int  nWidth, int nHeight, AXonLinkCamParam* allParam);
+	
+		bool waitAllStream(openni::VideoStream** streams, int allCount, int timeout);
 	private:
 
 		/** 设备管理器对象 */
 		openni::Device device;
 		/** 深度流对象 */
 		openni::VideoStream depth;
-		openni::VideoFrameRef frame;
-
-		CamIntrinsicParam* depthIntParam;
+		/** RGB流对象 */
+		openni::VideoStream color;
+		/** IR流对象 */
+		openni::VideoStream ir;
+		/** 深度数据帧对象 */
+		//openni::VideoFrameRef depthFrame;
+		/** 深度数据初始化参数 */
+		//CamIntrinsicParam* depthIntParam;
 
 		/** 图像捕获线程 */
 		std::shared_ptr<std::thread> capThread;
