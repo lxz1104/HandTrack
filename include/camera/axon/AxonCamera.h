@@ -44,7 +44,7 @@ namespace ht {
 			 */
 			explicit AXonCamera();
 
-			/** 销毁PMD相机实例 */
+			/** 销毁AXon相机实例 */
 			~AXonCamera() override;
 
 			/**
@@ -107,7 +107,7 @@ namespace ht {
 			 */
 			bool hasFlagMap() const override;
 
-			/** 指向PMD相机实例 */
+			/** 指向AXon相机实例 */
 			typedef std::shared_ptr<AXonCamera> Ptr;
 
 			//深度图像参数
@@ -144,9 +144,6 @@ namespace ht {
 			 */
 			void updateHelper();
 
-			CamIntrinsicParam* GetDepthInstrinsicParamByResolution(int  nWidth, int nHeight, AXonLinkCamParam* allParam);
-
-			bool waitAllStream(openni::VideoStream** streams, int allCount, int timeout);
 		private:
 
 			/** 设备管理器对象 */

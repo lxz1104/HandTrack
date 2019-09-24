@@ -84,7 +84,7 @@ namespace ht {
 		 *
 		 * @default: 0.053
 		 */
-        double handMaxArea = 0.053;
+        double handMaxArea = 0.058;
 
 		/**
 		 * 如果为 true,则手对象必须触摸可见区域的下/左下/右下边缘
@@ -207,7 +207,7 @@ namespace ht {
 
 		/**
 		 * 任意手指的(值尖y值  -  缺陷点y值)/abs(值尖x值 - 缺陷点x值) 的最小值。
-		 * 用于过滤掉一些部确定的手指
+		 * 用于过滤掉一些不确定的手指
 		 *
 		 * @default: -1.0
 		 */

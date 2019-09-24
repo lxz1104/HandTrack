@@ -86,26 +86,6 @@ namespace ht {
 
 		}
 
-		// 等待流同步
-		bool AXonCamera::waitAllStream(openni::VideoStream** streams, int allCount, int timeout)
-		{
-			int streamCount = allCount;
-			while (1)
-			{
-				if (streamCount == 0)
-					return true;
-				int readyStreamIndex = 0;
-				if (openni::STATUS_OK != openni::OpenNI::waitForAnyStream(streams, streamCount, &readyStreamIndex, timeout))
-				{
-					printf("Error: Device open failed:\n%s\n", openni::OpenNI::getExtendedError());
-					return false;
-				}
-
-				streams[readyStreamIndex] = NULL;
-
-				streamCount--;
-			}
-		}
 		/**
 		 * 构造函数
 		 */
@@ -115,8 +95,8 @@ namespace ht {
 			//初始化相机
 			this->initCamera();
 			// 初始化图像矩阵
-			this->xyzMap.create(cv::Size(AXonCamera::Depth_Width, AXonCamera::Depth_Width), CV_32FC3);
-			this->xyzBuffer.create(cv::Size(AXonCamera::Depth_Width, AXonCamera::Depth_Width), CV_32FC3);
+			this->xyzMap.create(cv::Size(AXonCamera::Depth_Width, AXonCamera::Depth_Height), CV_32FC3);
+			this->xyzBuffer.create(cv::Size(AXonCamera::Depth_Width, AXonCamera::Depth_Height), CV_32FC3);
 			// 初始化图像捕获线程
 			this->capThread = std::make_shared<std::thread>(&AXonCamera::updateHelper, this);
 		}
@@ -188,19 +168,18 @@ namespace ht {
 				this->xyzBuffer = cv::Scalar::all(0);
 				cv::Vec3f* xyzptr = nullptr;
 
-
-				for (int i = 0; i < depthFrame.getWidth(); i++)
+				for (int i = 0; i < depthFrame.getHeight(); i++)
 				{
-					//xyzptr = this->xyzBuffer.ptr<cv::Vec3f>(i);
-					for (int j = 0; j < depthFrame.getHeight(); j++)
+					xyzptr = this->xyzBuffer.ptr<cv::Vec3f>(i);
+					for (int j = 0; j < depthFrame.getWidth(); j++)
 					{
 						float pz = 0, px = 0, py = 0;
-						openni::CoordinateConverter::convertDepthToWorld(this->depth, j, i, depthImage[j * depthFrame.getWidth() + i], &px, &py, &pz);
-						xyzBuffer.ptr<cv::Vec3f>(j)[i][0] = px / 2000.0;
-						xyzBuffer.ptr<cv::Vec3f>(j)[i][1] = py / 2000.0;
-						xyzBuffer.ptr<cv::Vec3f>(j)[i][2] = pz / 2000.0;
-						if (xyzBuffer.ptr<cv::Vec3f>(j)[i][2] < NOISE_FILTER_LOW || xyzBuffer.ptr<cv::Vec3f>(j)[i][2] > NOISE_FILTER_HIGH) {
-							xyzBuffer.ptr<cv::Vec3f>(j)[i][2] = 0;
+						openni::CoordinateConverter::convertDepthToWorld(this->depth, j, i, depthImage[j + depthFrame.getWidth() * i], &px, &py, &pz);
+						xyzptr[j][0] = px / 2500.0;
+						xyzptr[j][1] = -(py / 2500.0);
+						xyzptr[j][2] = pz / 2500.0;
+						if (xyzptr[j][2] < NOISE_FILTER_LOW || xyzptr[j][2] > NOISE_FILTER_HIGH) {
+							xyzptr[j][2] = 0;
 						}
 						//printf("(%f,%f,%f)\n", xyzptr[j][2], xyzptr[j][2], xyzptr[j][2]);
 						//printf("with:%f, heigth: %f\n", depthFrame.getWidth(), depthFrame.getHeight());
@@ -215,22 +194,6 @@ namespace ht {
 			BOOST_LOG_TRIVIAL(info) << "图像捕获线程关闭...";
 
 		}
-
-		CamIntrinsicParam* AXonCamera::GetDepthInstrinsicParamByResolution(int  nWidth, int nHeight, AXonLinkCamParam* allParam)
-		{
-			// Find Color Sensor Intrinsic Parameters
-			CamIntrinsicParam* pstParam = NULL;
-			for (int i = 0; i < AXON_LINK_SUPPORTED_PARAMETERS; i++)
-			{
-				pstParam = &allParam->astDepthParam[i];
-				if (pstParam->ResolutionX == nWidth
-					&& pstParam->ResolutionY == nHeight)
-					return pstParam;
-			}
-
-			return NULL;
-		}
-
 
 		/********************* 重写的基类方法 *****************/
 		const std::string AXonCamera::getModelName() const {

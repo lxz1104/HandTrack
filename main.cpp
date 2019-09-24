@@ -16,7 +16,7 @@ int main() {
 	HandDetector::Ptr handDetector = std::make_shared<HandDetector>();
 
 	// 操作选项
-	bool showHands = true, useSVM = false, useEdgeConn = false, showArea = false;
+	bool showBackground = true, useSVM = false, useEdgeConn = false;
 
 	cv::Mat scaledZImage;
 
@@ -53,12 +53,9 @@ int main() {
 		// 设置检测参数
 		handDetector->setParams(params);
 
-		if (showHands) {
-			if (showHands) {
-				handDetector->update(*camera);
-				hands = handDetector->getHands();
-			}
-		}
+	
+		handDetector->update(*camera);
+		hands = handDetector->getHands();
 		
 
 		/**** 可视化部分 ****/
@@ -67,16 +64,25 @@ int main() {
 		cv::Mat handVisual;
 
 		// 可视化背景
-		Visualizer::visualizeXYZMap(xyzMap, handVisual, 1.0f);
+		//xyzMap = cv::Scalar::all(0);
+		if (showBackground) {
+			Visualizer::visualizeXYZMap(xyzMap, handVisual, 1.5f);
+		}
+		else
+		{
+			cv::Mat clearBackground(cv::Size(xyzMap.cols, xyzMap.rows), CV_32FC3);
+			clearBackground = cv::Scalar::all(0);
+			Visualizer::visualizeXYZMap(clearBackground, handVisual, 1.5f);
+		}
+		
 		Visualizer::visualizeXYZMap(xyzMap, xyzMap, 1.0f);
 		
 		const cv::Scalar WHITE(255, 255, 255);
 
 		// 或者检测到的手的特征
-		if (showHands) {
-			int i = 0;
-			for (Hand::Ptr & hand : hands) {
-				if (!handVisual.empty()) {
+		int i = 0;
+		for (Hand::Ptr & hand : hands) {
+			if (!handVisual.empty()) {
 					// 可视化检测到的手
 					Visualizer::visualizeHand(handVisual, handVisual, hand.get());
 					std::map<std::string, Vec3f> LMap = hand->getLHlabelXYZ();
@@ -86,15 +92,15 @@ int main() {
 					{
 						BOOST_LOG_TRIVIAL(info) << item.first << ": " << item.second;
 					}*/
-				}
-				++i;
-				if (i >= 2) {
-					break;
-				}
+			}
+			++i;
+			if (i >= 2) {
+				break;
 			}
 		}
 
-		if (showHands && hands.size() > 0) {
+
+		if (hands.size() > 0) {
 			// 显示检测到的手的数量
 			cv::putText(handVisual, std::to_string(hands.size()) +
 				util::pluralize(" Hand", hands.size()),
@@ -113,11 +119,11 @@ int main() {
 		
 		// 可视化手、平面、XYZMap
 		if (!xyzMap.empty()) {
-			scaledZImage.create(cv::Size(camera->getWidth() * 2, camera->getHeight() * 2), CV_8UC1);
+			scaledZImage.create(cv::Size(ht::camera::AXonCamera::Depth_Width * 1, ht::camera::AXonCamera::Depth_Height * 1), CV_8UC1);
 			resize(xyzMap, scaledZImage, scaledZImage.size());
 			cv::imshow(camera->getModelName() + " Depth Map", scaledZImage);
 			if (!handVisual.empty()) {
-				scaledZImage.create(cv::Size(camera->getWidth() * 2, camera->getHeight() * 2), CV_8UC1);
+				scaledZImage.create(cv::Size(ht::camera::AXonCamera::Depth_Width * 1, ht::camera::AXonCamera::Depth_Height * 1), CV_8UC1);
 				resize(handVisual, scaledZImage, scaledZImage.size());
 				cv::imshow("Demo Output", scaledZImage);
 			}
@@ -138,13 +144,16 @@ int main() {
 		// 切换模式
 		switch (c) {
 		case 'H':
-			showHands ^= 1; break;
+			showBackground ^= 1;
+			BOOST_LOG_TRIVIAL(info) << "Show Background: " << (showBackground ? "True" : "False");
+			break;
 		case 'S':
 			useSVM ^= 1; 
-			std::cout << "USE SVM: " << (useSVM ? "true" : "false") << std::endl;
+			BOOST_LOG_TRIVIAL(info) << "USE SVM: " << (useSVM ? "True" : "False");
 			break;
-		case 'A':
-			showArea ^= 1; break;
+		case 'U':
+			useEdgeConn ^= 1;
+			break;
 		}
 	}
 	cv::destroyAllWindows();
