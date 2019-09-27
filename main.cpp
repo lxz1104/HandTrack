@@ -158,7 +158,7 @@ void testHandTrack() {
             break;
         }
         // 切换模式
-        switch (c) {
+        switch(c) {
             case 'H':
                 showHands ^= 1;
                 break;
