@@ -354,6 +354,7 @@ namespace ht {
 		 */
 		std::map<std::string, Vec3f> RHcenterXYZ;
 
+
 		/**
 		 * 最大内接圆半径
 		 */

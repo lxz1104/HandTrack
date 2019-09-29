@@ -97,7 +97,7 @@ namespace ht {
 		cv::circle(output, center, static_cast<int>(hand->getCircleRadius()), cv::Scalar(100, 100, 100),
 			static_cast<int>(std::round(unitWid)));
 
-		const std::vector<Point2i>& fingers = hand->getFingersIJ();	// 被检测到的手指的指尖的像素坐标
+		const std::vector<Point2i>& fingers = hand->getFingersIJ();	// 被检测到的手指的指尖的像 素坐标
 		const std::vector<Point2i>& defects = hand->getDefectsIJ();	// 缺陷点像素坐标
 		const std::vector<Vec3f>& fingersXYZ = hand->getFingers();		// 被检测到的手指的指尖的世界坐标
 		const std::vector<Vec3f>& defectsXYZ = hand->getDefects();		// 缺陷点像素世界坐标
@@ -110,28 +110,28 @@ namespace ht {
 		if (!LHlabelij.empty()) {
 			for (auto iter = LHlabelij.begin();
 				iter != LHlabelij.end(); iter++) {
-				cv::putText(output, iter->first, iter->second, cv::FONT_HERSHEY_COMPLEX, 0.5,
+				cv::putText(output, iter->first, iter->second, cv::FONT_HERSHEY_COMPLEX, 1.5,
 					cv::Scalar(0, 255, 255));
 			}
 		}
 		if (!RHlabelij.empty()) {
 			for (auto iter = RHlabelij.begin();
 				iter != RHlabelij.end(); iter++) {
-				cv::putText(output, iter->first, iter->second, cv::FONT_HERSHEY_COMPLEX, 0.5,
+				cv::putText(output, iter->first, iter->second, cv::FONT_HERSHEY_COMPLEX, 1.5,
 					cv::Scalar(0, 255, 255));
-			}
+			} 
 		}
 		if (!LHcenterij.empty()) {
 			for (auto iter = LHcenterij.begin();
 				iter != LHcenterij.end(); iter++) {
-				cv::putText(output, iter->first, iter->second, cv::FONT_HERSHEY_COMPLEX, 0.5,
+				cv::putText(output, iter->first, iter->second, cv::FONT_HERSHEY_COMPLEX, 1,
 					cv::Scalar(0, 255, 255));
 			}
 		}
 		if (!RHcenterij.empty()) {
 			for (auto iter = RHcenterij.begin();
 				iter != RHcenterij.end(); iter++) {
-				cv::putText(output, iter->first, iter->second, cv::FONT_HERSHEY_COMPLEX, 0.5,
+				cv::putText(output, iter->first, iter->second, cv::FONT_HERSHEY_COMPLEX, 1,
 					cv::Scalar(0, 255, 255));
 			}
 		}
@@ -194,12 +194,12 @@ namespace ht {
 			output = input_mat;
 		}
 
-		if (equation.size() < 3) return;
+		if (equation.size( ) < 3) return;
 
 		cv::Scalar color = cv::Scalar(255 * (double)clicked, 255, 0);
 		int pointsDetected = 0;
 
-		for (int r = 0; r < input_mat.rows; r++)
+		for (int r = 0; r < input_mat.rows; r++) 
 		{
 			const auto* ptr = input_mat.ptr<Vec3f>(r);
 

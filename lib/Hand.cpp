@@ -604,6 +604,7 @@ namespace ht {
 		}
 
 		int nFin = (int)this->fingersIJ.size();
+		//std::cout << "缺陷点数：" << nFin << std::endl;
 
 		if (nFin == 1 && util::distanOfTwoPointIJ(contour[contourFarIdx], this->fingersIJ.at(0)) > 100)
 		{
@@ -616,17 +617,17 @@ namespace ht {
 			this->dominantDirXYZ = util::normalize(this->palmCenterXYZ - contourFarXYZ);
 		}
 
-		std::string LHfingersname[5] = { "L_THUMB", "L_FOREFINGER", "L_MIDFINGER", "L_RINGFINGER", "L_LITTERFINGER" };
-		std::string RHfingersname[5] = { "R_THUMB", "R_FOREFINGER", "R_MIDFINGER", "R_RINGFINGER", "R_LITTERFINGER" };
+		std::string fingersname[5] = { "A", "B", "C", "D", "E" };
+		
 
 		// 根据指尖到掌心的连线于手腕线的夹角从小到大排序 
 		if (nFin <= 5)
 		{
-			//计算各个指尖与掌心连线与手腕线的夹角
+			//计算各个指尖与手腕左侧连线与手腕线的夹角
 			for (int i = 0; i < nFin; i++)
 			{
 				float angle;
-				angle = static_cast<float>(util::getAngelOfTwoVector(wristIJ[0], wristIJ[1], palmCenterIJ, fingersIJ[i]));
+				angle = static_cast<float>(util::getAngelOfTwoVector(wristIJ[0], wristIJ[1], wristIJ[0], fingersIJ[i]));
 				included_angle.push_back(angle);
 			}
 			//将夹角从小到大排序
@@ -646,7 +647,7 @@ namespace ht {
 			{
 				for (size_t j = 0; j < fingersIJ.size(); j++)
 				{
-					if (included_angle[i] == util::getAngelOfTwoVector(wristIJ[0], wristIJ[1], palmCenterIJ, fingersIJ[j]))
+					if (included_angle[i] == util::getAngelOfTwoVector(wristIJ[0], wristIJ[1], wristIJ[0], fingersIJ[j]))
 					{
 						fingersIJSort.push_back(fingersIJ[j]);
 						fingersXYZSort.push_back(fingersXYZ[j]);
@@ -658,229 +659,252 @@ namespace ht {
 			}
 		}
 
-		//通过手臂中点与手腕中点连线与像素坐标系X轴的夹角的余弦值判断左右手
+		//通过手臂中点与手腕中点连线与像素坐标系X轴的夹角的余弦值判断左右手(较为准确)
 		Point2i Armorientation = wristmidIJ - armmid;
 		Point2i xaxis = Point2i(1, 0);
 		double cosangle = Armorientation.dot(xaxis) /
 			(sqrt(Armorientation.x * Armorientation.x + Armorientation.y * Armorientation.y) *
 				sqrt(xaxis.x * xaxis.x + xaxis.y * xaxis.y));
+		//左手
+		if (cosangle > 0)
+		{
+			LHcenterij.insert({ "CENTER_L", palmCenterIJ });
+			LHcenterXYZ.insert({ "CENTER_L", palmCenterXYZ });
+		}
+		//右手
+		if (cosangle < 0)
+		{
+			RHcenterij.insert({ "CENTER_R", palmCenterIJ });
+			RHcenterXYZ.insert({ "CENTER_R", palmCenterXYZ });
+		}
+	
 
-		//五个手指全部伸开，，可区分手心手背
+		//五个手指全部伸开,可区分手心手背 
 		if (fingersIJSort.size() == 5 && defectsIJSort.size() == 5) {
 			double dist0 = util::euclideanDistance(palmCenterXYZ, defectsXYZSort[0]);
-			double dist1 = util::euclideanDistance(palmCenterXYZ, defectsXYZSort[defectsXYZSort.size() - 1]);
+			double dist1 = util::euclideanDistance(palmCenterXYZ, defectsXYZSort[4]);
+			//先求手掌平面的法向量
+			Vec3f palm0 = palmCenterXYZ - defectsXYZSort[2];
+			Vec3f palm1 = defectsXYZSort[1] - defectsXYZSort[2];
+			Vec3f palm = palm0.cross(palm1);
+			//再求由手指和掌心的向量
+			Vec3f fingervectorLH = fingersXYZSort[0] - palmCenterXYZ;
+			Vec3f fingervectorRH = fingersXYZSort[4] - palmCenterXYZ;
+			//求左手两个向量的夹角的余弦值
+			double a0 = palm.dot(fingervectorLH);
+			double b0 = sqrt((palm[0] * palm[0] + palm[1] * palm[1] + palm[2] * palm[2]) *
+				(fingervectorLH[0] * fingervectorLH[0] + fingervectorLH[1] * fingervectorLH[1] + fingervectorLH[2] * fingervectorLH[2]));
+			double cos_include_angleLH = a0 / b0;
+			//求右手两个向量的夹角的余弦值
+			double a1 = palm.dot(fingervectorRH);
+			double b1 = sqrt((palm[0] * palm[0] + palm[1] * palm[1] + palm[2] * palm[2]) *
+				(fingervectorRH[0] * fingervectorRH[0] + fingervectorRH[1] * fingervectorRH[1] + fingervectorRH[2] * fingervectorRH[2]));
+			double cos_include_angleRH = a1 / b1;
 			//左手
-			if (cosangle > 0) {
-				LHcenterij.insert({ "L_CENTER", palmCenterIJ });
-				LHcenterXYZ.insert({ "L_CENTER", palmCenterXYZ });
+			if (cosangle > 0)
+			{
 				//手背
-				if (dist0 < dist1) {
-					for (size_t i = 0; i < 5; i++) {
-						LHlabelij.insert({ LHfingersname[i], fingersIJSort[i] });
-						LHlabelXYZ.insert({ LHfingersname[i], fingersXYZSort[i] });
+				if (dist0 < dist1)
+				{
+					for (size_t i = 0; i < 5; i++) 
+					{
+						LHlabelij.insert({ fingersname[i], fingersIJSort[i] });
+						LHlabelXYZ.insert({ fingersname[i], fingersXYZSort[i] });
 					}
 				}
 				//手心
-				if (dist0 > dist1) {
-					for (size_t i = 0; i < 5; i++) {
-						LHlabelij.insert({ LHfingersname[i], fingersIJSort[4 - i] });
-						LHlabelXYZ.insert({ LHfingersname[i], fingersXYZSort[4 - i] });
+				if (cos_include_angleLH > 0 && dist0 > dist1)
+				{
+					for (size_t i = 0; i < 5; i++)
+					{
+						LHlabelij.insert({ fingersname[i], fingersIJSort[4 - i] });
+						LHlabelXYZ.insert({ fingersname[i], fingersXYZSort[4 - i] });
 					}
 				}
 			}
 			//右手
-			if (cosangle < 0) {
-				RHcenterij.insert({ "R_CENTER", palmCenterIJ });
-				RHcenterXYZ.insert({ "R_CENTER", palmCenterXYZ });
-				//手心
-				if (dist0 < dist1) {
-					for (size_t i = 0; i < 5; i++) {
-						RHlabelij.insert({ RHfingersname[i], fingersIJSort[i] });
-						RHlabelXYZ.insert({ RHfingersname[i], fingersXYZSort[i] });
+			if (cosangle < 0)
+			{
+				//手背
+				if (dist0 > dist1)
+				{
+					for (size_t i = 0; i < 5; i++) 
+					{
+						RHlabelij.insert({ fingersname[i], fingersIJSort[4 - i] });
+						RHlabelXYZ.insert({ fingersname[i], fingersXYZSort[4 - i] });
 					}
 				}
-				//手背
-				if (dist0 > dist1) {
-					for (size_t i = 0; i < 5; i++) {
-						RHlabelij.insert({ RHfingersname[i], fingersIJSort[4 - i] });
-						RHlabelXYZ.insert({ RHfingersname[i], fingersXYZSort[4 - i] });
+				//手心
+				if (cos_include_angleRH > 0 && dist0 < dist1)
+				{
+					for (size_t i = 0; i < 5; i++)
+					{
+						RHlabelij.insert({ fingersname[i], fingersIJSort[i] });
+						RHlabelXYZ.insert({ fingersname[i], fingersXYZSort[i] });
 					}
 				}
 			}
+			
+
 		}
 
 
 
-		//伸出四个手指（针对特定手势：从食指到小拇指，不包括大拇指），可区分手心手背
+		//伸出四个手指（针对特定手势：大拇指到无名指）区分手心手背 
 		if (fingersXYZSort.size() == 4 && defectsXYZSort.size() == 4) {
-			double dist0 = util::euclideanDistance(palmCenterXYZ, fingersXYZSort[0]);
-			double dist1 = util::euclideanDistance(palmCenterXYZ, fingersXYZSort[3]);
-			//左手
-			if (cosangle > 0) {
-				LHcenterij.insert({ "L_CENTER", palmCenterIJ });
-				LHcenterXYZ.insert({ "L_CENTER", palmCenterXYZ });
-				//手背
-				if (dist0 > dist1) {
-					for (size_t i = 0; i < 4; i++) {
-						LHlabelij.insert({ LHfingersname[i + 1], fingersIJSort[i] });
-						LHlabelXYZ.insert({ LHfingersname[i + 1], fingersXYZSort[i] });
-					}
-				}
-				//手心
-				if (dist0 < dist1) {
-					for (size_t i = 0; i < 4; i++) {
-						LHlabelij.insert({ LHfingersname[i + 1], fingersIJSort[3 - i] });
-						LHlabelXYZ.insert({ LHfingersname[i + 1], fingersXYZSort[3 - i] });
-					}
-				}
-			}
+			double dist0 = util::euclideanDistance(palmCenterXYZ, defectsXYZSort[0]);
+			double dist1 = util::euclideanDistance(palmCenterXYZ, defectsXYZSort[3]);
+			//先求手掌平面的法向量
+			Vec3f palm0 = palmCenterXYZ - defectsXYZSort[2];
+			Vec3f palm1 = defectsXYZSort[1] - defectsXYZSort[2];
+			Vec3f palm = palm0.cross(palm1);
+			//再求由手指和掌心的向量
+			Vec3f fingervectorLH = fingersXYZSort[3] - palmCenterXYZ;
+			Vec3f fingervectorRH = fingersXYZSort[3] - palmCenterXYZ;
+			//求左手两个向量的夹角的余弦值
+			double a0 = palm.dot(fingervectorLH);
+			double b0 = sqrt((palm[0] * palm[0] + palm[1] * palm[1] + palm[2] * palm[2]) *
+				(fingervectorLH[0] * fingervectorLH[0] + fingervectorLH[1] * fingervectorLH[1] + fingervectorLH[2] * fingervectorLH[2]));
+			double cos_include_angleLH = a0 / b0;
+			//求右手两个向量的夹角的余弦值
+			double a1 = palm.dot(fingervectorRH);
+			double b1 = sqrt((palm[0] * palm[0] + palm[1] * palm[1] + palm[2] * palm[2]) *
+				(fingervectorRH[0] * fingervectorRH[0] + fingervectorRH[1] * fingervectorRH[1] + fingervectorRH[2] * fingervectorRH[2]));
+			double cos_include_angleRH = a1 / b1;
 			//右手
-			if (cosangle < 0) {
-				RHcenterij.insert({ "R_CENTER", palmCenterIJ });
-				RHcenterXYZ.insert({ "R_CENTER", palmCenterXYZ });
+			if (cosangle < 0)
+			{
 				//手心
-				if (dist0 > dist1) {
-					for (size_t i = 0; i < 4; i++) {
-						RHlabelij.insert({ RHfingersname[i + 1], fingersIJSort[i] });
-						RHlabelXYZ.insert({ RHfingersname[i + 1], fingersXYZSort[i] });
+				if (cos_include_angleRH > 0 && dist0 < dist1)
+				{
+					for (size_t i = 0; i < 4; i++)
+					{
+						RHlabelij.insert({ fingersname[i], fingersIJSort[i] });
+						RHlabelXYZ.insert({ fingersname[i], fingersXYZSort[i] });
 					}
 				}
 				//手背
-				if (dist0 < dist1) {
-					for (size_t i = 0; i < 4; i++) {
-						RHlabelij.insert({ RHfingersname[i + 1], fingersIJSort[3 - i] });
-						RHlabelXYZ.insert({ RHfingersname[i + 1], fingersXYZSort[3 - i] });
+				if (dist0 > dist1)
+				{
+					for (size_t i = 0; i < 4; i++)
+					{
+						RHlabelij.insert({ fingersname[i], fingersIJSort[3 - i] });
+						RHlabelXYZ.insert({ fingersname[i], fingersXYZSort[3 - i] });
 					}
 				}
 			}
+			//左手
+			if (cosangle > 0)
+			{
+				//手心
+				if (cos_include_angleLH > 0 && dist0 > dist1)
+				{
+					for (size_t i = 0; i < 4; i++)
+					{
+						LHlabelij.insert({ fingersname[i], fingersIJSort[3 - i] });
+						LHlabelXYZ.insert({ fingersname[i], fingersXYZSort[3 - i] });
+					}
+				}
+				//手背
+				if (dist0 < dist1)
+				{
+					for (size_t i = 0; i < 4; i++)
+					{
+						LHlabelij.insert({ fingersname[i], fingersIJSort[i] });
+						LHlabelXYZ.insert({ fingersname[i], fingersXYZSort[i] });
+					}
+				}
+			}
+
 		}
 
-		//伸出三个手指（针对特定手势：中指到小拇指，不包括食指和大拇指），可区分手心手背
+		//伸出三个手指（针对特定手势：大拇指到中指）,可区分手心手背
 		if (fingersXYZSort.size() == 3 && defectsXYZSort.size() == 3) {
-			double dist0 = util::euclideanDistance(wristmidXYZ, fingersXYZSort[0]);
-			double dist1 = util::euclideanDistance(wristmidXYZ, fingersXYZSort[2]);
-			//左手
-			if (cosangle > 0) {
-				LHcenterij.insert({ "L_CENTER", palmCenterIJ });
-				LHcenterXYZ.insert({ "L_CENTER", palmCenterXYZ });
-				//手背
-				if (dist0 > dist1) {
-					for (size_t i = 0; i < 3; i++) {
-						LHlabelij.insert({ LHfingersname[i + 2], fingersIJSort[i] });
-						LHlabelXYZ.insert({ LHfingersname[i + 2], fingersXYZSort[i] });
-					}
-				}
-				//手心
-				if (dist0 < dist1) {
-					for (size_t i = 0; i < 3; i++) {
-						LHlabelij.insert({ LHfingersname[i + 2], fingersIJSort[2 - i] });
-						LHlabelXYZ.insert({ LHfingersname[i + 2], fingersXYZSort[2 - i] });
-					}
-				}
-			}
+			double dist0 = util::euclideanDistance(fingersXYZSort[0], palmCenterXYZ);
+			double dist1 = util::euclideanDistance(fingersXYZSort[2], palmCenterXYZ);
 			//右手
-			if (cosangle < 0) {
-				RHcenterij.insert({ "R_CENTER", palmCenterIJ });
-				RHcenterXYZ.insert({ "R_CENTER", palmCenterXYZ });
-				//手背
-				if (dist0 < dist1) {
-					for (size_t i = 0; i < 3; i++) {
-						RHlabelij.insert({ RHfingersname[i + 2], fingersIJSort[2 - i] });
-						RHlabelXYZ.insert({ RHfingersname[i + 2], fingersXYZSort[2 - i] });
-					}
-				}
+			if (cosangle < 0)
+			{
 				//手心
-				if (dist0 > dist1) {
-					for (size_t i = 0; i < 3; i++) {
-						RHlabelij.insert({ RHfingersname[i + 2], fingersIJSort[i] });
-						RHlabelXYZ.insert({ RHfingersname[i + 2], fingersXYZSort[i] });
+				if (dist0 < dist1)
+				{
+					for (size_t i = 0; i < 3; i++)
+					{
+						RHlabelij.insert({ fingersname[i], fingersIJSort[i] });
+						RHlabelXYZ.insert({ fingersname[i], fingersXYZSort[i] });
 					}
 				}
+				//手背
+				if (dist0 > dist1)
+				{
+					for (size_t i = 0; i < 3; i++)
+					{
+						RHlabelij.insert({ fingersname[i], fingersIJSort[2 - i] });
+						RHlabelXYZ.insert({ fingersname[i], fingersXYZSort[2 - i] });
+					}
+				}
+				
 			}
+			//左手
+			if (cosangle > 0)
+			{
+				//手心
+				if (dist0 > dist1)
+				{
+					for (size_t i = 0; i < 3; i++)
+					{
+						LHlabelij.insert({ fingersname[i], fingersIJSort[2 - i] });
+						LHlabelXYZ.insert({ fingersname[i], fingersXYZSort[2 - i] });
+					}
+				}
+				//手背
+				if (dist0 < dist1)
+				{
+					for (size_t i = 0; i < 3; i++)
+					{
+						LHlabelij.insert({ fingersname[i], fingersIJSort[i] });
+						LHlabelXYZ.insert({ fingersname[i], fingersXYZSort[i] });
+					}
+				} 
+			}
+			
 		}
 
-		//伸出两个手指（针对特定手势：捏合动作（大拇指和食指），YES动作（食指和中指）），YES动作可区分手心手背，捏合动作值区分左右手
+		//伸出两个手指（针对特定手势：捏合动作（大拇指和食指）） 只针对手背
 		if (fingersXYZSort.size() == 2 && defectsXYZSort.size() == 2) {
-			double dist0 = util::euclideanDistance(defectsXYZSort[1], fingersXYZSort[0]);
-			double dist1 = util::euclideanDistance(defectsXYZSort[1], fingersXYZSort[1]);
-			double dist2 = util::euclideanDistance(palmCenterXYZ, fingersXYZSort[0]);
-			double dist3 = util::euclideanDistance(palmCenterXYZ, fingersXYZSort[1]);
 			//左手
-			if (cosangle > 0) {
-				LHcenterij.insert({ "L_CENTER", palmCenterIJ });
-				LHcenterXYZ.insert({ "L_CENTER", palmCenterXYZ });
-				//捏合动作
-				if (dist2 < 0.105) {
-					for (size_t i = 0; i < 2; i++) {
-						LHlabelij.insert({ LHfingersname[i], fingersIJSort[i] });
-						LHlabelXYZ.insert({ LHfingersname[i], fingersXYZSort[i] });
-					}
-				}
-				else {
-					//Yes动作
-					//手背
-					if (dist0 < dist1) {
-						for (size_t i = 0; i < 2; i++) {
-							LHlabelij.insert({ LHfingersname[i + 1], fingersIJSort[i] });
-							LHlabelXYZ.insert({ LHfingersname[i + 1], fingersXYZSort[i] });
-						}
-					}
-					//手心
-					if (dist0 > dist1) {
-						for (size_t i = 0; i < 2; i++) {
-							LHlabelij.insert({ LHfingersname[i + 1], fingersIJSort[1 - i] });
-							LHlabelXYZ.insert({ LHfingersname[i + 1], fingersXYZSort[1 - i] });
-						}
-					}
+			if (cosangle > 0)
+			{
+				for (size_t i = 0; i < 2; i++)
+				{
+					LHlabelij.insert({ fingersname[i], fingersIJSort[i] });
+					LHlabelXYZ.insert({ fingersname[i], fingersXYZSort[i] });
 				}
 			}
 			//右手
-			if (cosangle < 0) {
-				RHcenterij.insert({ "R_CENTER", palmCenterIJ });
-				RHcenterXYZ.insert({ "R_CENTER", palmCenterXYZ });
-				//捏合动作
-				if (dist3 < 0.105) {
-					for (size_t i = 0; i < 2; i++) {
-						RHlabelij.insert({ RHfingersname[i], fingersIJSort[1 - i] });
-						RHlabelXYZ.insert({ RHfingersname[i], fingersXYZSort[1 - i] });
-					}
+			if (cosangle < 0)
+			{
+				for (size_t i = 0; i < 2; i++)
+				{
+					RHlabelij.insert({ fingersname[i], fingersIJSort[1 - i] });
+					RHlabelXYZ.insert({ fingersname[i], fingersXYZSort[1 - i] });
 				}
-				else {
-					//Yes动作
-					//手背
-					if (dist0 > dist1) {
-						for (size_t i = 0; i < 2; i++) {
-							RHlabelij.insert({ RHfingersname[i + 1], fingersIJSort[1 - i] });
-							RHlabelXYZ.insert({ RHfingersname[i + 1], fingersXYZSort[1 - i] });
-						}
-					}
-					//手心
-					if (dist0 < dist1) {
-						for (size_t i = 0; i < 2; i++) {
-							RHlabelij.insert({ RHfingersname[i + 1], fingersIJSort[i] });
-							RHlabelXYZ.insert({ RHfingersname[i + 1], fingersXYZSort[i] });
-						}
-					}
-				}
-
 			}
 		}
 
-		//一个手指（针对特定手势：食指点击手势），只区分左右手
+		//一个手指（针对特定手势：食指点击动作）不区分手心手背
 		if (fingersXYZSort.size() == 1 && defectsXYZSort.size() == 1) {
 			//左手
-			if (cosangle > 0) {
-				LHcenterij.insert({ "L_CENTER", palmCenterIJ });
-				LHcenterXYZ.insert({ "L_CENTER", palmCenterXYZ });
-				LHlabelij.insert({ LHfingersname[1], fingersIJSort[0] });
-				LHlabelXYZ.insert({ LHfingersname[1], fingersXYZSort[0] });
+			if (cosangle > 0)
+			{
+				LHlabelij.insert({ fingersname[1], fingersIJSort[0] });
+				LHlabelXYZ.insert({ fingersname[1], fingersXYZSort[0] });
 			}
 			//右手
-			if (cosangle < 0) {
-				RHcenterij.insert({ "R_CENTER", palmCenterIJ });
-				RHcenterXYZ.insert({ "R_CENTER", palmCenterXYZ });
-				RHlabelij.insert({ RHfingersname[1], fingersIJSort[0] });
-				RHlabelXYZ.insert({ RHfingersname[1], fingersXYZSort[0] });
+			if (cosangle < 0)
+			{
+				RHlabelij.insert({ fingersname[1], fingersIJSort[0] });
+				RHlabelXYZ.insert({ fingersname[1], fingersXYZSort[0] });
 			}
 		}
 

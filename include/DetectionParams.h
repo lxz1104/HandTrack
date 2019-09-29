@@ -77,7 +77,7 @@ namespace ht {
 		 *
 		 * @default: 0.008
 		 */
-        double handMinArea = 0.008;
+        double handMinArea = 0.006;
 
 		/**
 		 * 手的最大表面积(单位: 平方米)
@@ -175,7 +175,7 @@ namespace ht {
 		 *
 		 * @default: 0.085
 		 */
-        float wristWidthMax = 0.085f;
+        float wristWidthMax = 0.130f;
 
 		/**
 		 * 从手腕到手部中心的最大距离（单位：米）
