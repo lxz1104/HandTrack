@@ -1,6 +1,5 @@
 ﻿/***********************************************************
 @File: ThreadPool.hpp
-@Author: lxz
 @Date: 2019-07-10
 @Description: 线程池类，实现了简易的线程池，目前暂时弃用
 @History: NULL

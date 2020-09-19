@@ -1,6 +1,5 @@
 ﻿/***************************************************************************
  *@File:HandClassifier.h
- *@Author:YQ
  *@Date:2019-07-26
  *@Description：该头文件主要实现了对分类器Classifier，SVM手分类器SVMHandClassifier
  *              基于SVM验证器SVMHandValidator三个类定义，对相关函数进行了声明
