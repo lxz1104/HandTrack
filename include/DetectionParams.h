@@ -1,6 +1,5 @@
 ﻿/***********************************************************
  @File:DetectionParams.h
- @Author:lxz
  @Date:2019-7-23
  @Description: 定义了一些检测器的参数
  @History:

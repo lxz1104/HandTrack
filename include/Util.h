@@ -1,6 +1,5 @@
 ﻿/***********************************************************
  @File: Util.h
- @Author: LXZ
  @Date: 2019-07-01
  @Description: 几何计算类库
  @History: NULL

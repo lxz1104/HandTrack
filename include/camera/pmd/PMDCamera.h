@@ -1,6 +1,5 @@
 ﻿/***********************************************************
 @File:PlaneDetector.h
-@Author:lxz
 @Date:2019-7-30
 @Description: 根据PMD相机驱动改写的相机类
 @History: 

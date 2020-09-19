@@ -1,6 +1,5 @@
 ﻿/***********************************************************
 @File: DepthCamera.h
-@Author: lxz
 @Date: 2019-07-22
 @Description: 深度相机与算法之间的统一接口(此部分没设计好，需要重构)
 @History: NULL
@@ -9,7 +8,6 @@
 #ifndef DEPTH_CAMERA_H
 #define DEPTH_CAMERA_H
 
-//#include "ThreadPool.hpp"
 #include "DetectionParams.h"
 #include <opencv2/opencv.hpp>
 #include <mutex>

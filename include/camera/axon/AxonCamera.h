@@ -1,8 +1,7 @@
 /***********************************************************
 @File:PlaneDetector.h
-@Author:lxz
 @Date:2019-9-18
-@Description: ¸ù¾ÝaxonÏà»úÇý¶¯¸ÄÐ´µÄÏà»úÀà
+@Description: ï¿½ï¿½ï¿½ï¿½axonï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 @History: NULL
 ************************************************************/
 
@@ -29,8 +28,8 @@
 namespace ht {
 	namespace camera {
 		/**
-		* @AXonCamera: AXonÏà»úÇý¶¯Àà
-		* ÓÃÓÚÇý¶¯AXonÏà»úµÄÅÉÉúÀà£¬ÖØÐ´ÁËÒ»Ð©Í¼Ïñ»ñÈ¡µÄ·½·¨¡£
+		* @AXonCamera: AXonï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+		* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½AXonï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½à£¬ï¿½ï¿½Ð´ï¿½ï¿½Ò»Ð©Í¼ï¿½ï¿½ï¿½È¡ï¿½Ä·ï¿½ï¿½ï¿½ï¿½ï¿½
 		*
 		* @Type: Normal
 		*/
@@ -38,41 +37,41 @@ namespace ht {
 		{
 		public:
 			/**
-			 * ¹¹Ôìº¯Êý
-			 * @Descrip:°üº¬³õÊ¼»¯²¢Æô¶¯Ïà»úµÈ²Ù×÷
-			 * @param [in] params: Æ½Ãæ¼ì²âÆ÷²ÎÊýÊµÀý
+			 * ï¿½ï¿½ï¿½ìº¯ï¿½ï¿½
+			 * @Descrip:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È²ï¿½ï¿½ï¿½
+			 * @param [in] params: Æ½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Êµï¿½ï¿½
 			 */
 			explicit AXonCamera();
 
-			/** Ïú»ÙAXonÏà»úÊµÀý */
+			/** ï¿½ï¿½ï¿½ï¿½AXonï¿½ï¿½ï¿½Êµï¿½ï¿½ */
 			~AXonCamera() override;
 
 			/**
-			 * »ñÈ¡Ïà»úÐÍºÅ
-			 * @Descrip: ÖØÐ´DepthCamreaÀàÖÐµÄº¯Êý
+			 * ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½Íºï¿½
+			 * @Descrip: ï¿½ï¿½Ð´DepthCamreaï¿½ï¿½ï¿½ÐµÄºï¿½ï¿½ï¿½
 			 *
-			 * @retun [std::string]: Ïà»úµÄÃû³Æ»òÐÍºÅ
+			 * @retun [std::string]: ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ»ï¿½ï¿½Íºï¿½
 			 */
 			const std::string getModelName() const override;
 
 			/**
-			 * »ñÈ¡Éî¶ÈÍ¼ÏñµÄÏñËØ¿í¶È
-			 * @Descrip: ´Ë¿í¶ÈÓÉÏà»úµÄ×Ô´ø²ÎÊý¾ö¶¨
+			 * ï¿½ï¿½È¡ï¿½ï¿½ï¿½Í¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ø¿ï¿½ï¿½
+			 * @Descrip: ï¿½Ë¿ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 			 *
-			 * @return [int] Í¼ÏñÏñËØ¿í¶È
+			 * @return [int] Í¼ï¿½ï¿½ï¿½ï¿½ï¿½Ø¿ï¿½ï¿½
 			 */
 			int getWidth() const override;
 
 			/**
-			 * »ñÈ¡Éî¶ÈÍ¼ÏñµÄÏñËØ¸ß¶È
-			 * @Descrip: ´Ë¿í¶ÈÓÉÏà»úµÄ×Ô´ø²ÎÊý¾ö¶¨
+			 * ï¿½ï¿½È¡ï¿½ï¿½ï¿½Í¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ø¸ß¶ï¿½
+			 * @Descrip: ï¿½Ë¿ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 			 *
-			 * @return [int] Í¼ÏñÏñËØ¸ß¶È
+			 * @return [int] Í¼ï¿½ï¿½ï¿½ï¿½ï¿½Ø¸ß¶ï¿½
 			 */
 			int getHeight() const override;
 
 			/**
-			 * È·¶¨µãÏà¶ÔÓÚÏà»úµÄflagMapµÄÓÐÐ§ÐÔµÄÖµ
+			 * È·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½flagMapï¿½ï¿½ï¿½ï¿½Ð§ï¿½Ôµï¿½Öµ
 			 * @Descrip:
 			 *
 			 * return [float]
@@ -80,7 +79,7 @@ namespace ht {
 			float flagMapConfidenceThreshold() const override;
 
 			/**
-			 * È·¶¨Ïà»úAmpMapµÄµãÓÐÐ§µÄÖµ
+			 * È·ï¿½ï¿½ï¿½ï¿½ï¿½AmpMapï¿½Äµï¿½ï¿½ï¿½Ð§ï¿½ï¿½Öµ
 			 * @Descrip:
 			 *
 			 * return [int]
@@ -88,47 +87,47 @@ namespace ht {
 			int ampMapInvalidFlagValue() const override;
 
 			/**
-			 * ÊÇ·ñÐèÒª»òÕßÄÜ¹»´ÓÏà»úÖÐ»ñÈ¡AmpMap
-			 * @Descrip: Ö»ÐèÒªÉèÖÃº¯ÊýµÄ·µ»ØÖµ¼´¿É;
-			 * Èç¹ûÄãµÄÏà»ú²»ÄÜ»ñÈ¡AmpMapÍ¼Ïñ£¬ÇëÄãÎñ±ØÉèÖÃÎªfalse£»
-			 * Èç¹ûÉèÖÃÎªtrueºó£¬±ØÐëµ½update()ÖÐÊµÏÖ»ñÈ¡¸ÃÍ¼ÏñµÄ·½·¨
+			 * ï¿½Ç·ï¿½ï¿½ï¿½Òªï¿½ï¿½ï¿½ï¿½ï¿½Ü¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð»ï¿½È¡AmpMap
+			 * @Descrip: Ö»ï¿½ï¿½Òªï¿½ï¿½ï¿½Ãºï¿½ï¿½ï¿½ï¿½Ä·ï¿½ï¿½ï¿½Öµï¿½ï¿½ï¿½ï¿½;
+			 * ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ü»ï¿½È¡AmpMapÍ¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îªfalseï¿½ï¿½
+			 * ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îªtrueï¿½ó£¬±ï¿½ï¿½ëµ½update()ï¿½ï¿½Êµï¿½Ö»ï¿½È¡ï¿½ï¿½Í¼ï¿½ï¿½Ä·ï¿½ï¿½ï¿½
 			 *
 			 * @return [bool]
 			 */
 			bool hasAmpMap() const override;
 
 			/**
-			 * ÊÇ·ñÐèÒª»òÕßÄÜ¹»´ÓÏà»úÖÐ»ñÈ¡flagMap
-			 * @Descrip: Ö»ÐèÒªÉèÖÃº¯ÊýµÄ·µ»ØÖµ¼´¿É;
-			 * Èç¹ûÄãµÄÏà»ú²»ÄÜ»ñÈ¡flagMapÍ¼Ïñ£¬ÇëÄãÎñ±ØÉèÖÃÎªfalse£»
-			 * Èç¹ûÉèÖÃÎªtrueºó£¬±ØÐëµ½update()ÖÐÊµÏÖ»ñÈ¡¸ÃÍ¼ÏñµÄ·½·¨
+			 * ï¿½Ç·ï¿½ï¿½ï¿½Òªï¿½ï¿½ï¿½ï¿½ï¿½Ü¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð»ï¿½È¡flagMap
+			 * @Descrip: Ö»ï¿½ï¿½Òªï¿½ï¿½ï¿½Ãºï¿½ï¿½ï¿½ï¿½Ä·ï¿½ï¿½ï¿½Öµï¿½ï¿½ï¿½ï¿½;
+			 * ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ü»ï¿½È¡flagMapÍ¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îªfalseï¿½ï¿½
+			 * ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îªtrueï¿½ó£¬±ï¿½ï¿½ëµ½update()ï¿½ï¿½Êµï¿½Ö»ï¿½È¡ï¿½ï¿½Í¼ï¿½ï¿½Ä·ï¿½ï¿½ï¿½
 			 *
 			 * @return [bool]
 			 */
 			bool hasFlagMap() const override;
 
-			/** Ö¸ÏòAXonÏà»úÊµÀý */
+			/** Ö¸ï¿½ï¿½AXonï¿½ï¿½ï¿½Êµï¿½ï¿½ */
 			typedef std::shared_ptr<AXonCamera> Ptr;
 
-			//Éî¶ÈÍ¼Ïñ²ÎÊý
-			static const int Depth_Width = 640; // Éî¶ÈÍ¼Ïñ¿í¶È
-			static const int Depth_Height = 480; // Éî¶ÈÍ¼Ïñ¸ß¶È
+			//ï¿½ï¿½ï¿½Í¼ï¿½ï¿½ï¿½ï¿½ï¿½
+			static const int Depth_Width = 640; // ï¿½ï¿½ï¿½Í¼ï¿½ï¿½ï¿½ï¿½
+			static const int Depth_Height = 480; // ï¿½ï¿½ï¿½Í¼ï¿½ï¿½ß¶ï¿½
 
 		protected:
 			/**
-			 * ´ÓÏà»úÖÐ»ñµÃÏÂÒ»Ö¡Í¼ÏñÐÅÏ¢
-			 * @Descrip: ´ÓÉî¶ÈÏà»úÖÐ»ñÈ¡ÏÂÒ»Ö¡µÄXYZ,RGB,IRµÈÍ¼Ïñ
-			 * Í¨¹ýµ÷ÓÃ´Ëº¯ÊýÀ´Ë¢ÐÂ¶ÔÓ¦µÄÍ¼ÏñÐÅÏ¢£¬Äã¿ÉÒÔÔÚ´Ëº¯ÊýÖÐ´ÓÏà»úÖÐ»ñÈ¡Í¼Ïñ²¢×ª»¯Îª¶ÔÓ¦µÄmapÐÎÊ½¡£
-			 * ×¢Òâ£º»ñÈ¡µÄ***_mapµÄ¿í¸ß±ØÐëÓëÉÏÃægetHeight(),getWidth()º¯Êý»ñÈ¡µ½µÄÒ»ÖÂ£¬·ñÔò¿ÉÄÜµ¼ÖÂ³ÌÐò±ÀÀ£¡£
-			 * ×¢Òâ£ºÈç¹ûÔÚÔÚºóÃæµÄº¯ÊýÖÐhas***Map()ÉèÖÃÎªflase£¬Ôò¶ÔÓ¦µÄ***_mapÔò¿ÉÒÔ²»ÓÃ»ñÈ¡£»
-			 * ÀýÈç£¬Èç¹ûÄãµÄÏà»úÄÜ¹»»ñÈ¡µÄRGBÍ¼ÏñÇÒÉèÖÃhasRGBMap()·µ»Øtrue,ÄÇÃ´Ôò±ØÐëÒª¸ø²ÎÊýrgb_map¸üÐÂÄÚÈÝ¡£
-			 * ×¢Òâ£º´Ë·½·¨±ØÐëÒªÔÚÅÉÉúÀàÖÐÊµÏÖ£¡£¡£¡
+			 * ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð»ï¿½ï¿½ï¿½ï¿½Ò»Ö¡Í¼ï¿½ï¿½ï¿½ï¿½Ï¢
+			 * @Descrip: ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð»ï¿½È¡ï¿½ï¿½Ò»Ö¡ï¿½ï¿½XYZ,RGB,IRï¿½ï¿½Í¼ï¿½ï¿½
+			 * Í¨ï¿½ï¿½ï¿½ï¿½ï¿½Ã´Ëºï¿½ï¿½ï¿½ï¿½ï¿½Ë¢ï¿½Â¶ï¿½Ó¦ï¿½ï¿½Í¼ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ú´Ëºï¿½ï¿½ï¿½ï¿½Ð´ï¿½ï¿½ï¿½ï¿½ï¿½Ð»ï¿½È¡Í¼ï¿½ï¿½×ªï¿½ï¿½Îªï¿½ï¿½Ó¦ï¿½ï¿½mapï¿½ï¿½Ê½ï¿½ï¿½
+			 * ×¢ï¿½â£ºï¿½ï¿½È¡ï¿½ï¿½***_mapï¿½Ä¿ï¿½ß±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½getHeight(),getWidth()ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½Ò»ï¿½Â£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Üµï¿½ï¿½Â³ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+			 * ×¢ï¿½â£ºï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Úºï¿½ï¿½ï¿½Äºï¿½ï¿½ï¿½ï¿½ï¿½has***Map()ï¿½ï¿½ï¿½ï¿½Îªflaseï¿½ï¿½ï¿½ï¿½ï¿½Ó¦ï¿½ï¿½***_mapï¿½ï¿½ï¿½ï¿½Ô²ï¿½ï¿½Ã»ï¿½È¡ï¿½ï¿½
+			 * ï¿½ï¿½ï¿½ç£¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ü¹ï¿½ï¿½ï¿½È¡ï¿½ï¿½RGBÍ¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½hasRGBMap()ï¿½ï¿½ï¿½ï¿½true,ï¿½ï¿½Ã´ï¿½ï¿½ï¿½ï¿½ï¿½Òªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½rgb_mapï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý¡ï¿½
+			 * ×¢ï¿½â£ºï¿½Ë·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Òªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Êµï¿½Ö£ï¿½ï¿½ï¿½ï¿½ï¿½
 			 *
-			 * @param [out] xyz_map		Éî¶ÈÍ¼ÏñÖÐËùÓÐµãµÄXYZ×ø±ê. CV_32FC3
-			 * @param [out] rgb_map		RGBÍ¼Ïñ. CV_8UC3
-			 * @param [out] ir_map		ºìÍâÍ¼Ïñ. CV_8UC1
-			 * @param [out] amp_map		ÖÃÐÅ²ÎÊý. CV_32FC1
-			 * @param [out] flag_map	ÆäËüÍ¼Ïñ. CV_8UC1
+			 * @param [out] xyz_map		ï¿½ï¿½ï¿½Í¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ðµï¿½ï¿½XYZï¿½ï¿½ï¿½ï¿½. CV_32FC3
+			 * @param [out] rgb_map		RGBÍ¼ï¿½ï¿½. CV_8UC3
+			 * @param [out] ir_map		ï¿½ï¿½ï¿½ï¿½Í¼ï¿½ï¿½. CV_8UC1
+			 * @param [out] amp_map		ï¿½ï¿½ï¿½Å²ï¿½ï¿½ï¿½. CV_32FC1
+			 * @param [out] flag_map	ï¿½ï¿½ï¿½ï¿½Í¼ï¿½ï¿½. CV_8UC1
 			 *
 			 * @return [void]
 			 */
@@ -136,37 +135,37 @@ namespace ht {
 				cv::Mat& amp_map, cv::Mat& flag_map) override;
 		private:
 			/**
-			 * ³õÊ¼»¯Ïà»ú
+			 * ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½ï¿½
 			 */
 			void initCamera();
 			/**
-			 * ¸üÐÂÉî¶ÈÐÅÏ¢¸¨Öúº¯Êý
+			 * ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 			 */
 			void updateHelper();
 
 		private:
 
-			/** Éè±¸¹ÜÀíÆ÷¶ÔÏó */
+			/** ï¿½è±¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
 			openni::Device device;
-			/** Éî¶ÈÁ÷¶ÔÏó */
+			/** ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
 			openni::VideoStream depth;
 
-			/** Í¼Ïñ²¶»ñÏß³Ì */
+			/** Í¼ï¿½ñ²¶»ï¿½ï¿½ß³ï¿½ */
 			std::shared_ptr<std::thread> capThread;
 
-			/** ÐÅºÅÁ¿£¬ÓÃÓÚ¿ØÖÆÍ¼Ïñ²¶»ñÏß³Ì */
+			/** ï¿½Åºï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ú¿ï¿½ï¿½ï¿½Í¼ï¿½ñ²¶»ï¿½ï¿½ß³ï¿½ */
 			std::atomic_bool isCapture;
 
-			/** Í¼Ïñ»¥³âËø */
+			/** Í¼ï¿½ñ»¥³ï¿½ï¿½ï¿½ */
 			std::mutex imageMutex;
 
-			/** °üº¬ÈýÎ¬µãÔÆÐÅÏ¢µÄÍ¼Ïñ¾ØÕó */
+			/** ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Î¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½Í¼ï¿½ï¿½ï¿½ï¿½ï¿½ */
 			cv::Mat xyzMap;
 
-			/** Í¼Ïñ¾ØÕó»º³å */
+			/** Í¼ï¿½ï¿½ï¿½ï¿½ó»º³ï¿½ */
 			cv::Mat xyzBuffer;
 
-			// È¥Ôë²ÎÊý
+			// È¥ï¿½ï¿½ï¿½ï¿½ï¿½
 			const float NOISE_FILTER_LOW = 0.10f;
 			const float NOISE_FILTER_HIGH = 0.80f;
 		};
