@@ -1,3 +1,4 @@
+Thanks for [OpenARK](https://github.com/augcog/OpenARK)!
 # 文件说明
 `include`文件夹下为头文件，`lib`文件夹下为`.cpp`文件，，`main.cpp`为代码使用的示例，基于**pico flexx**相机和**AXon**相机。
 每个文件中都有相应的注释，请仔细阅读
